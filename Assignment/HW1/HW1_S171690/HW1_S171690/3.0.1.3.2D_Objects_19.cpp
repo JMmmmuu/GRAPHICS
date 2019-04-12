@@ -848,6 +848,9 @@ void draw_sword() {
 	glBindVertexArray(0);
 }
 
+float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
+int house_trans_order = 0;
+glm::mat4 shearingMat = glm::mat4x4(1.0f);
 
 void display(void) {
 	int i;
@@ -914,6 +917,26 @@ void display(void) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_sword();
 
+	// my Own Code
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
+	switch (house_trans_order) {
+		case 0: case 4: case 5: case 6: case 7:
+			ModelMatrix = glm::scale(ModelMatrix, glm::vec3(house_scale_x, house_scale_y, 1.0f));
+			break;
+		case 1: case 2: case 3:
+			shearingMat[0][1] = 0;
+			shearingMat[1][0] = house_ratio;
+			ModelMatrix *= shearingMat;
+			ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f, 3.0f, 1.0f));
+			break;
+	}
+	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_house();
+
+
+
 	glFlush();
 }
 
@@ -939,6 +962,61 @@ void reshape(int width, int height) {
 	glutPostRedisplay();
 }
 
+void timer_scene(int timestamp_scene) {
+	switch (house_trans_order) {
+		case 0:
+			house_scale_y += 0.1f;
+			if (house_scale_y > 3.0f) {
+				house_scale_y = 3.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		case 1:
+			house_ratio += 0.1f;
+			if (house_ratio > 2) {
+				house_ratio = 2.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		case 2:
+			house_ratio -= 0.1f;
+			if (house_ratio < -2) {
+				house_ratio = -2.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		case 3:
+			house_ratio += 0.1f;
+			if (house_ratio > 0) {
+				house_ratio = 0.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		case 4:
+			house_scale_x += 0.1f;
+			if (house_scale_x > 3.0f) {
+				house_scale_x = 3.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		case 5:
+			house_scale_y -= 0.1f;
+			if (house_scale_y < 1.0f) {
+				house_scale_y = 1.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		case 6:
+			house_scale_x -= 0.1f;
+			if (house_scale_x < 1.0f) {
+				house_scale_x = 1.0f;
+				house_trans_order = (house_trans_order + 1) % 7;
+			}
+			break;
+		}
+	glutPostRedisplay();
+	glutTimerFunc(50, timer_scene, 1);
+}
 void cleanup(void) {
 	glDeleteVertexArrays(1, &VAO_axes);
 	glDeleteBuffers(1, &VBO_axes);
@@ -956,6 +1034,7 @@ void register_callbacks(void) {
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
+	glutTimerFunc(50, timer_scene, 1);
 	glutCloseFunc(cleanup);
 }
 
