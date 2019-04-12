@@ -19,7 +19,7 @@ glm::mat4 ViewMatrix, ProjectionMatrix, ViewProjectionMatrix;
 
 #define LOC_VERTEX 0
 
-int win_width = 0, win_height = 0;
+int win_width = 1200, win_height = 700;
 float centerx = 0.0f, centery = 0.0f, rotate_angle = 0.0f;
 
 GLfloat axes[4][2];
@@ -852,6 +852,9 @@ float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
 int house_trans_order = 0;
 glm::mat4 shearingMat = glm::mat4x4(1.0f);
 
+float sword_radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
+float sword_timer_pos = sword_radius;
+
 void display(void) {
 	int i;
 	float x, r, s, delx, delr, dels;
@@ -918,6 +921,10 @@ void display(void) {
 	draw_sword();
 
 	// my Own Code
+
+
+
+	// 4) HOUSE TRANSFORMATION - SCALING & SHEARING
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
 	switch (house_trans_order) {
@@ -936,6 +943,28 @@ void display(void) {
 	draw_house();
 
 
+	// SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
+	float angle;
+	//sword_radius = sword_radius / 16 * 15;
+	float sword_size;
+	glm::vec3 sword_co;
+	for (angle = 0; angle < 360; angle += 30) {
+		sword_co = glm::vec3(sword_timer_pos * cos((float)angle * TO_RADIAN), sword_timer_pos * sin((float)angle * TO_RADIAN), 0.0f);
+		sword_size = sword_timer_pos / sword_radius * 3.5f;
+		ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+
+		ModelMatrix = glm::translate(ModelMatrix, sword_co);
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(sword_size, sword_size, 1.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, (90 + angle)*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+		ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		draw_sword();
+	}
+
+
 
 	glFlush();
 }
@@ -950,6 +979,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 void reshape(int width, int height) {
 	win_width = width, win_height = height;
+	sword_radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 
 	glViewport(0, 0, win_width, win_height);
 	ProjectionMatrix = glm::ortho(-win_width / 2.0, win_width / 2.0,
@@ -1013,9 +1043,14 @@ void timer_scene(int timestamp_scene) {
 				house_trans_order = (house_trans_order + 1) % 7;
 			}
 			break;
-		}
+	}
+
+	sword_timer_pos -= 5.0f;
+	if (sword_timer_pos < 0)
+		sword_timer_pos = sword_radius;
+
 	glutPostRedisplay();
-	glutTimerFunc(50, timer_scene, 1);
+	glutTimerFunc(40, timer_scene, 1);
 }
 void cleanup(void) {
 	glDeleteVertexArrays(1, &VAO_axes);
@@ -1034,7 +1069,7 @@ void register_callbacks(void) {
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
-	glutTimerFunc(50, timer_scene, 1);
+	glutTimerFunc(40, timer_scene, 1);
 	glutCloseFunc(cleanup);
 }
 
@@ -1120,7 +1155,7 @@ void main(int argc, char *argv[]) {
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_MULTISAMPLE);
-	glutInitWindowSize(1200, 300);
+	glutInitWindowSize(1200, 700);
 	glutInitContextVersion(4, 0);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutCreateWindow(program_name);
