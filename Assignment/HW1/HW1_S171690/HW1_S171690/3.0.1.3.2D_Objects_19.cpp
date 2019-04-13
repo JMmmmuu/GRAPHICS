@@ -876,6 +876,7 @@ int cocktail_angle = 0;
 int cocktail_line_angle = 0;
 float cock_timer_x = 0, cock_timer_y = max_win_size / 16;
 int cock_trans_order = 0;
+int isLine = 0;
 glm::mat4 initTransform(glm::mat4 ModelMatrix);
 
 void display(void) {
@@ -945,13 +946,12 @@ void display(void) {
 
 	// my Own Code
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	drawLine(radius * cos((float)cocktail_line_angle * TO_RADIAN), radius * sin((float)cocktail_line_angle * TO_RADIAN), -radius * cos((float)cocktail_line_angle * TO_RADIAN), -radius * sin((float)cocktail_line_angle * TO_RADIAN));
 
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
 	air_x = radius * sin(5 * airplane_angle * TO_RADIAN) * cos(airplane_angle * TO_RADIAN);
 	air_y = radius * sin(5 + airplane_angle * TO_RADIAN) * sin(airplane_angle * TO_RADIAN);
-	
+
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(air_x, air_y, 0.0f));
 	ModelMatrix = glm::rotate(ModelMatrix, (90 + airplane_angle) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -1001,21 +1001,28 @@ void display(void) {
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
 	switch (house_trans_order) {
-		case 0: case 4: case 5: case 6: case 7:
-			ModelMatrix = glm::scale(ModelMatrix, glm::vec3(house_scale_x, house_scale_y, 1.0f));
-			break;
-		case 1: case 2: case 3:
-			shearingMat[0][1] = 0;
-			shearingMat[1][0] = house_ratio;
-			ModelMatrix *= shearingMat;
-			ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f, 3.0f, 1.0f));
-			break;
+	case 0: case 4: case 5: case 6: case 7:
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(house_scale_x, house_scale_y, 1.0f));
+		break;
+	case 1: case 2: case 3:
+		shearingMat[0][1] = 0;
+		shearingMat[1][0] = house_ratio;
+		ModelMatrix *= shearingMat;
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f, 3.0f, 1.0f));
+		break;
 	}
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_house();
 
 	// 5) COCKTAIL TRANSFORMATION - REFLECTION(TRANSLATION & ROTATION)
+	if (isLine) {
+		drawLine(radius * cos((float)cocktail_line_angle * TO_RADIAN), radius * sin((float)cocktail_line_angle * TO_RADIAN), -radius * cos((float)cocktail_line_angle * TO_RADIAN), -radius * sin((float)cocktail_line_angle * TO_RADIAN));
+		drawLine(radius * cos((float)cocktail_angle * TO_RADIAN) - 50, radius * sin((float)cocktail_angle * TO_RADIAN), radius * cos((float)cocktail_angle * TO_RADIAN) + 50, radius * sin((float)cocktail_angle * TO_RADIAN));
+		drawLine(radius * cos((float)cocktail_angle * TO_RADIAN), radius * sin((float)cocktail_angle * TO_RADIAN) - 50, radius * cos((float)cocktail_angle * TO_RADIAN), radius * sin((float)cocktail_angle * TO_RADIAN) + 50);
+		drawLine(radius * cos((float)(cocktail_line_angle + 60) * TO_RADIAN) - 50, radius * sin((float)(cocktail_line_angle + 60) * TO_RADIAN), radius * cos((float)(cocktail_line_angle + 60) * TO_RADIAN) + 50, radius * sin((float)(cocktail_line_angle + 60) * TO_RADIAN));
+		drawLine(radius * cos((float)(cocktail_line_angle + 60) * TO_RADIAN), radius * sin((float)(cocktail_line_angle + 60) * TO_RADIAN) - 50, radius * cos((float)(cocktail_line_angle + 60) * TO_RADIAN), radius * sin((float)(cocktail_line_angle + 60) * TO_RADIAN) + 50);
+	}
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
 
@@ -1025,9 +1032,9 @@ void display(void) {
 	glm::mat4 MCtoWC = glm::mat4(1.0f);
 	MCtoWC = glm::translate(MCtoWC, glm::vec3(radius * cos((float)cocktail_angle * TO_RADIAN), radius * sin((float)cocktail_angle * TO_RADIAN), 0.0f));
 	glm::mat4 reflectLine = glm::mat4(1.0f);
-	reflectLine = rotate(MCtoWC, cocktail_line_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-	reflectLine = scale(MCtoWC, glm::vec3(1.0f, -1.0f, 1.0f));
-	reflectLine = rotate(MCtoWC, -(cocktail_line_angle * TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
+	reflectLine = rotate(reflectLine, cocktail_line_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	reflectLine = scale(reflectLine, glm::vec3(1.0f, -1.0f, 1.0f));
+	reflectLine = rotate(reflectLine, -(cocktail_line_angle * TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix * MCtoWC * ModelMatrix;		// Modeling Coordinate to World Coordinate
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
@@ -1035,7 +1042,7 @@ void display(void) {
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix * reflectLine * MCtoWC * ModelMatrix;		// reflect a cocktail to the line
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	//draw_cocktail();
+	draw_cocktail();
 
 	// relect a cocktail to origin in MC
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -1048,7 +1055,7 @@ void display(void) {
 	draw_cocktail();
 	ModelViewProjectionMatrix = ViewProjectionMatrix * reflectLine * MCtoWC * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	//draw_cocktail();
+	draw_cocktail();
 
 
 
@@ -1107,6 +1114,9 @@ void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 27: // ESC key
 		glutLeaveMainLoop(); // Incur destuction callback for cleanups.
+		break;
+	case 'l': case 'L':
+		isLine = isLine ? 0 : 1;
 		break;
 	}
 }
