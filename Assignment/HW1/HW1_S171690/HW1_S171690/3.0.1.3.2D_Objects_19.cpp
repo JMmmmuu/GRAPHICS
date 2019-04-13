@@ -852,8 +852,16 @@ float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
 int house_trans_order = 0;
 glm::mat4 shearingMat = glm::mat4x4(1.0f);
 
-float sword_radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
-float sword_timer_pos = sword_radius;
+float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
+float sword_timer_pos = radius;
+
+int cocktail_timer_rotation = 0;
+int cocktail_angle = 0;
+int cocktail_line_angle = 0;
+float max_win_size = win_width < win_height ? win_width : win_height;
+float cock_timer_x = 0, cock_timer_y = max_win_size / 16;
+int cock_trans_order = 0;
+glm::mat4 initTransform(glm::mat4 ModelMatrix);
 
 void display(void) {
 	int i;
@@ -921,8 +929,26 @@ void display(void) {
 	draw_sword();
 
 	// my Own Code
+	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 
 
+	// 3) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
+	float angle;
+	float sword_size;
+	glm::vec3 sword_co;
+	for (angle = 0; angle < 360; angle += 30) {
+		sword_co = glm::vec3(sword_timer_pos * cos((float)angle * TO_RADIAN), sword_timer_pos * sin((float)angle * TO_RADIAN), 0.0f);
+		sword_size = sword_timer_pos / radius * 3.5f;
+		ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+		ModelMatrix = glm::translate(ModelMatrix, sword_co);
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(sword_size, sword_size, 1.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, (90 + angle)*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		draw_sword();
+	}
 
 	// 4) HOUSE TRANSFORMATION - SCALING & SHEARING
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -942,31 +968,38 @@ void display(void) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_house();
 
+	// 5) COCKTAIL TRANSFORMATION - REFLECTION(TRANSLATION & ROTATION)
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
 
-	// SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
-	float angle;
-	//sword_radius = sword_radius / 16 * 15;
-	float sword_size;
-	glm::vec3 sword_co;
-	for (angle = 0; angle < 360; angle += 30) {
-		sword_co = glm::vec3(sword_timer_pos * cos((float)angle * TO_RADIAN), sword_timer_pos * sin((float)angle * TO_RADIAN), 0.0f);
-		sword_size = sword_timer_pos / sword_radius * 3.5f;
-		ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = initTransform(ModelMatrix);
 
+	glm::mat4 MCtoWC = glm::mat4(1.0f);
+	MCtoWC = glm::translate(MCtoWC, glm::vec3(radius * cos((float)cocktail_angle * TO_RADIAN), radius * sin((float)cocktail_angle * TO_RADIAN), 0.0f));
 
-		ModelMatrix = glm::translate(ModelMatrix, sword_co);
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(sword_size, sword_size, 1.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, (90 + angle)*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix * MCtoWC * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_cocktail();
 
-
-		ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-		draw_sword();
-	}
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(-1.0f, -1.0f, 1.0f));
+	ModelMatrix = initTransform(ModelMatrix);
+	
+	ModelViewProjectionMatrix = ViewProjectionMatrix * MCtoWC * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_cocktail();
 
 
 
 	glFlush();
+}
+
+glm::mat4 initTransform(glm::mat4 ModelMatrix) {
+	glm::vec3 cock_co = glm::vec3(cock_timer_x, cock_timer_y, 0.0f);
+	ModelMatrix = glm::translate(ModelMatrix, cock_co);
+	ModelMatrix = glm::rotate(ModelMatrix, cocktail_timer_rotation * TO_RADIAN, glm::vec3(0.0f, 0.0f, 0.1f));
+	return ModelMatrix;
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -979,7 +1012,9 @@ void keyboard(unsigned char key, int x, int y) {
 
 void reshape(int width, int height) {
 	win_width = width, win_height = height;
-	sword_radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
+	radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
+	max_win_size = win_width < win_height ? win_width : win_height;
+
 
 	glViewport(0, 0, win_width, win_height);
 	ProjectionMatrix = glm::ortho(-win_width / 2.0, win_width / 2.0,
@@ -993,6 +1028,7 @@ void reshape(int width, int height) {
 }
 
 void timer_scene(int timestamp_scene) {
+	// HOUSE
 	switch (house_trans_order) {
 		case 0:
 			house_scale_y += 0.1f;
@@ -1045,9 +1081,57 @@ void timer_scene(int timestamp_scene) {
 			break;
 	}
 
+	// SWORD
 	sword_timer_pos -= 5.0f;
 	if (sword_timer_pos < 0)
-		sword_timer_pos = sword_radius;
+		sword_timer_pos = radius;
+
+	// COCKTAIL
+	cocktail_timer_rotation = (cocktail_timer_rotation + 30) % 360;
+	cocktail_line_angle = (cocktail_line_angle + 1) % 360;
+	cocktail_angle = (cocktail_line_angle + 300) % 360;
+	switch (cock_trans_order) {
+		case 0:
+			cock_timer_x -= 1;
+			cock_timer_y = cock_timer_x + (max_win_size / 16);
+			if (cock_timer_x <= -(max_win_size / 16)) {
+				cock_timer_x = -(max_win_size / 16);
+				cock_timer_y = 0;
+				cock_trans_order = (cock_trans_order + 1) % 4;
+			}
+			break;
+		case 1:
+			cock_timer_x += 1;
+			cock_timer_y = -cock_timer_x - (max_win_size / 16);
+			if (cock_timer_x >= 0) {
+				cock_timer_x = 0;
+				cock_timer_y = -(max_win_size / 16);
+				cock_trans_order = (cock_trans_order + 1) % 4;
+			}
+			break;
+		case 2:
+			cock_timer_x += 1;
+			cock_timer_y = cock_timer_x - (max_win_size / 16);
+			if (cock_timer_x >= (max_win_size / 16)) {
+				cock_timer_x = (max_win_size / 16);
+				cock_timer_y = 0;
+				cock_trans_order = (cock_trans_order + 1) % 4;
+			}
+			break;
+		case 3:
+			cock_timer_x -= 1;
+			cock_timer_y = -cock_timer_x + (max_win_size / 16);
+			if (cock_timer_x <= 0) {
+				cock_timer_x = 0;
+				cock_timer_y = max_win_size / 16;
+				cock_trans_order = (cock_trans_order + 1) % 4;
+			}
+			break;
+	}
+	fprintf(stdout, "%f %f\n", cock_timer_x, cock_timer_y);
+
+
+
 
 	glutPostRedisplay();
 	glutTimerFunc(40, timer_scene, 1);
