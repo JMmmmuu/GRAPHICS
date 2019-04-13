@@ -848,19 +848,31 @@ void draw_sword() {
 	glBindVertexArray(0);
 }
 
+float max_win_size = win_width < win_height ? win_width : win_height;
+float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
+int collisionDetected(float distX, float distY, float xRadius, float yRadius);
+
+// AIRPLANE FACTORS
 int airplane_angle = 0;
 
+// CAR FACTORS
+float car_scale_ratio = 1.0f;
+float car_trans_ratio = 0;
+float car1_x = -(win_width / 3);
+float car2_x = win_width / 3;
+
+// HOUSE FACTORS
 float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
 int house_trans_order = 0;
 glm::mat4 shearingMat = glm::mat4x4(1.0f);
 
-float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
+// SWORD FACTORS
 float sword_timer_pos = radius;
 
+// COCKTAIL FACTORS
 int cocktail_timer_rotation = 0;
 int cocktail_angle = 0;
 int cocktail_line_angle = 0;
-float max_win_size = win_width < win_height ? win_width : win_height;
 float cock_timer_x = 0, cock_timer_y = max_win_size / 16;
 int cock_trans_order = 0;
 glm::mat4 initTransform(glm::mat4 ModelMatrix);
@@ -944,7 +956,23 @@ void display(void) {
 	draw_airplane();
 
 
-	
+	// 2) CAR TRANSFORMATION - TRANSLATION & ROTATION
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(-(win_width / 3), 50.0f, 0.0f));
+
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(car_scale_ratio, 1.0f, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(win_width / 250, win_width / 250, 1.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_car();
+	//
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(car2_x, 50.0f, 0.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(win_width / 250, win_width / 250, 1.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_car2();
 
 
 	// 3) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
@@ -1032,6 +1060,14 @@ glm::mat4 initTransform(glm::mat4 ModelMatrix) {
 	return ModelMatrix;
 }
 
+int collisionDetected(float distX, float distY, float xRadius, float yRadius) {
+	float dist = sqrt(distX * distX + distY + distY);
+	fprintf(stdout, "%f %f\n", dist, xRadius + yRadius);
+	if (dist <= xRadius + yRadius)
+		return 1;
+	return 0;
+}
+
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
 	case 27: // ESC key
@@ -1044,6 +1080,8 @@ void reshape(int width, int height) {
 	win_width = width, win_height = height;
 	radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 	max_win_size = win_width < win_height ? win_width : win_height;
+
+	//car1_x = win_width / 3;// car2_x = win_width / 3;
 
 
 	glViewport(0, 0, win_width, win_height);
@@ -1060,6 +1098,21 @@ void reshape(int width, int height) {
 void timer_scene(int timestamp_scene) {
 	// AIRPLANE
 	airplane_angle = (airplane_angle + 5) % 360;
+
+	// CARS
+	float car_shearing_ratio = 0;
+	float car_trans_ratio = 0;
+
+	car2_x -= 20;
+	if (car1_x - car2_x <= 16.0f * (float)win_width / 250.0f + 18.0f * (float)win_width / 250.0f) {
+	//if (collisionDetected(car1_x - car2_x, 0, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f)) {
+		car_scale_ratio -= 0.1f;
+	}
+	if (car2_x <= car1_x) {
+		car2_x = win_width / 3;
+		car_scale_ratio = 1.0f;
+	}
+	fprintf(stdout, "%f %f  %d  %f %f\n", car1_x, car2_x, win_width, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f);
 
 	// HOUSE
 	switch (house_trans_order) {
@@ -1161,7 +1214,6 @@ void timer_scene(int timestamp_scene) {
 			}
 			break;
 	}
-	fprintf(stdout, "%f %f\n", cock_timer_x, cock_timer_y);
 
 
 
