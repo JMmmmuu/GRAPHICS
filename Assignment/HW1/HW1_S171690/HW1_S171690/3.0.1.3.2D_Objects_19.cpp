@@ -972,15 +972,25 @@ void display(void) {
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
 
+	// draw first format of cocktail
 	ModelMatrix = initTransform(ModelMatrix);
 
 	glm::mat4 MCtoWC = glm::mat4(1.0f);
 	MCtoWC = glm::translate(MCtoWC, glm::vec3(radius * cos((float)cocktail_angle * TO_RADIAN), radius * sin((float)cocktail_angle * TO_RADIAN), 0.0f));
+	glm::mat4 reflectLine = glm::mat4(1.0f);
+	reflectLine = rotate(MCtoWC, cocktail_line_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	reflectLine = scale(MCtoWC, glm::vec3(1.0f, -1.0f, 1.0f));
+	reflectLine = rotate(MCtoWC, -(cocktail_line_angle * TO_RADIAN), glm::vec3(0.0f, 0.0f, 1.0f));
 
-	ModelViewProjectionMatrix = ViewProjectionMatrix * MCtoWC * ModelMatrix;
+	ModelViewProjectionMatrix = ViewProjectionMatrix * MCtoWC * ModelMatrix;		// Modeling Coordinate to World Coordinate
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_cocktail();
 
+	ModelViewProjectionMatrix = ViewProjectionMatrix * reflectLine * MCtoWC * ModelMatrix;		// reflect a cocktail to the line
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_cocktail();
+
+	// relect a cocktail to origin in MC
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(-1.0f, -1.0f, 1.0f));
@@ -989,6 +999,11 @@ void display(void) {
 	ModelViewProjectionMatrix = ViewProjectionMatrix * MCtoWC * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_cocktail();
+	ModelViewProjectionMatrix = ViewProjectionMatrix * reflectLine * MCtoWC * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_cocktail();
+
+
 
 
 
@@ -1092,7 +1107,7 @@ void timer_scene(int timestamp_scene) {
 	cocktail_angle = (cocktail_line_angle + 300) % 360;
 	switch (cock_trans_order) {
 		case 0:
-			cock_timer_x -= 1;
+			cock_timer_x -= 5;
 			cock_timer_y = cock_timer_x + (max_win_size / 16);
 			if (cock_timer_x <= -(max_win_size / 16)) {
 				cock_timer_x = -(max_win_size / 16);
@@ -1101,7 +1116,7 @@ void timer_scene(int timestamp_scene) {
 			}
 			break;
 		case 1:
-			cock_timer_x += 1;
+			cock_timer_x += 5;
 			cock_timer_y = -cock_timer_x - (max_win_size / 16);
 			if (cock_timer_x >= 0) {
 				cock_timer_x = 0;
@@ -1110,7 +1125,7 @@ void timer_scene(int timestamp_scene) {
 			}
 			break;
 		case 2:
-			cock_timer_x += 1;
+			cock_timer_x += 5;
 			cock_timer_y = cock_timer_x - (max_win_size / 16);
 			if (cock_timer_x >= (max_win_size / 16)) {
 				cock_timer_x = (max_win_size / 16);
@@ -1119,7 +1134,7 @@ void timer_scene(int timestamp_scene) {
 			}
 			break;
 		case 3:
-			cock_timer_x -= 1;
+			cock_timer_x -= 5;
 			cock_timer_y = -cock_timer_x + (max_win_size / 16);
 			if (cock_timer_x <= 0) {
 				cock_timer_x = 0;
