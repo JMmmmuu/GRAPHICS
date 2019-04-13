@@ -848,6 +848,8 @@ void draw_sword() {
 	glBindVertexArray(0);
 }
 
+int airplane_angle = 0;
+
 float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
 int house_trans_order = 0;
 glm::mat4 shearingMat = glm::mat4x4(1.0f);
@@ -930,6 +932,19 @@ void display(void) {
 
 	// my Own Code
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
+	float air_x, air_y;
+	air_x = radius * sin(5 * airplane_angle * TO_RADIAN) * cos(airplane_angle * TO_RADIAN);
+	air_y = radius * sin(5 + airplane_angle * TO_RADIAN) * sin(airplane_angle * TO_RADIAN);
+	
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(air_x, air_y, 0.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, (90 + airplane_angle) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_airplane();
+
+
+	
 
 
 	// 3) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
@@ -1043,6 +1058,9 @@ void reshape(int width, int height) {
 }
 
 void timer_scene(int timestamp_scene) {
+	// AIRPLANE
+	airplane_angle = (airplane_angle + 5) % 360;
+
 	// HOUSE
 	switch (house_trans_order) {
 		case 0:
