@@ -851,6 +851,7 @@ void draw_sword() {
 float max_win_size = win_width < win_height ? win_width : win_height;
 float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 int collisionDetected(float distX, float distY, float xRadius, float yRadius);
+void drawLine(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2);
 
 // AIRPLANE FACTORS
 int airplane_angle = 0;
@@ -943,6 +944,9 @@ void display(void) {
 	draw_sword();
 
 	// my Own Code
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	drawLine(radius * cos((float)cocktail_line_angle * TO_RADIAN), radius * sin((float)cocktail_line_angle * TO_RADIAN), -radius * cos((float)cocktail_line_angle * TO_RADIAN), -radius * sin((float)cocktail_line_angle * TO_RADIAN));
+
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
 	air_x = radius * sin(5 * airplane_angle * TO_RADIAN) * cos(airplane_angle * TO_RADIAN);
@@ -1031,7 +1035,7 @@ void display(void) {
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix * reflectLine * MCtoWC * ModelMatrix;		// reflect a cocktail to the line
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_cocktail();
+	//draw_cocktail();
 
 	// relect a cocktail to origin in MC
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -1044,13 +1048,44 @@ void display(void) {
 	draw_cocktail();
 	ModelViewProjectionMatrix = ViewProjectionMatrix * reflectLine * MCtoWC * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_cocktail();
-
+	//draw_cocktail();
 
 
 
 
 	glFlush();
+}
+
+void drawLine(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) {
+	GLuint VBO_line, VAO_line;
+	GLfloat line[2][2];
+	line[0][0] = x1; line[0][1] = y1;
+	line[1][0] = x2; line[1][1] = y2;
+
+	ModelViewProjectionMatrix = ViewProjectionMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+
+	glGenBuffers(1, &VBO_line);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_line);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &VAO_line);
+	glBindVertexArray(VAO_line);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_line);
+	glVertexAttribPointer(LOC_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	glUniform3fv(loc_primitive_color, 1, axes_color);
+	glBindVertexArray(VAO_line);
+	glDrawArrays(GL_LINES, 0, 2);
+	glBindVertexArray(0);
+
+	glBindVertexArray(0);
 }
 
 glm::mat4 initTransform(glm::mat4 ModelMatrix) {
