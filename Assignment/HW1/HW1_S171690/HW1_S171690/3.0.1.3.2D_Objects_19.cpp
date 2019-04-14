@@ -839,6 +839,7 @@ int face_rotate[FACE_NUM] = { 0, }, face_prev_rotate[FACE_NUM] = { 0, };
 int face_angle = 0;
 int face_num = 0, CREATED = 0;
 
+int FACE_BUTTON = 0;
 int ANGRY = 0;
 float angry_x = -((float)win_width / 2) - ((float)win_height / 2);
 
@@ -989,39 +990,40 @@ void display(void) {
 
 
 	// CUSTOMIZE OBJECT
-	int idx;
-	if (!CREATED) {
-		if (face_angle % 15 == 0) {
-			idx = face_angle / 15;
-			face_rotate[idx] = face_angle;
-			face_prev_rotate[idx] = face_angle;
-			ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-			ModelMatrix = glm::rotate(ModelMatrix, face_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-			ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-			glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-			draw_face();
+	if (FACE_BUTTON) {
+		int idx;
+		if (!CREATED) {
+			if (face_angle % 15 == 0) {
+				idx = face_angle / 15;
+				face_rotate[idx] = face_angle;
+				face_prev_rotate[idx] = face_angle;
+				ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+				ModelMatrix = glm::rotate(ModelMatrix, face_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+				ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+				glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+				draw_face();
 
-			face_num++;
-			//if (face_angle == 355) CREATED = 1;
+				face_num++;
+				if (face_num == 24) CREATED = 1;
+			}
+			for (int i = 0; i < face_num; i++) {
+				ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+				ModelMatrix = glm::translate(ModelMatrix, glm::vec3(face_x[i], face_y[i], 0.0f));
+				ModelMatrix = glm::rotate(ModelMatrix, face_rotate[i] * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+				ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+				glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+				draw_face();
+			}
 		}
-		for (int i = 0; i < face_num; i++) {
-			ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(face_x[i], face_y[i], 0.0f));
-			ModelMatrix = glm::rotate(ModelMatrix, face_rotate[i] * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-			ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-			glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-			draw_face();
-		}
-		if (face_angle == 355) CREATED = 1;
-	}
-	else {
-		for (int i = 0; i < FACE_NUM; i++) {
-			ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-			ModelMatrix = glm::translate(ModelMatrix, glm::vec3(face_x[i], face_y[i], 0.0f));
-			ModelMatrix = glm::rotate(ModelMatrix, face_rotate[i] * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-			ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-			glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-			draw_face();
+		else {
+			for (int i = 0; i < FACE_NUM; i++) {
+				ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+				ModelMatrix = glm::translate(ModelMatrix, glm::vec3(face_x[i], face_y[i], 0.0f));
+				ModelMatrix = glm::rotate(ModelMatrix, face_rotate[i] * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+				ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+				glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+				draw_face();
+			}
 		}
 	}
 
@@ -1064,8 +1066,21 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'l': case 'L':
 		isLine = isLine ? 0 : 1;
 		break;
+	case 'f': case 'F':
+		if (FACE_BUTTON) FACE_BUTTON = 0;
+		else {
+			CREATED = 0; face_num = 0;
+			for (int i = 0; i < FACE_NUM; i++) {
+				face_x[i] = 0; face_y[i] = 0;
+				x_basis[i] = 0; y_basis[i] = 0;
+				face_angle = 0;
+			}
+			FACE_BUTTON = 1;
+		}
+		break;
 	case 'a': case 'A':
 		ANGRY = 1;
+		break;
 	}
 }
 
@@ -1094,9 +1109,6 @@ void reshape(int width, int height) {
 }
 
 int outOfScreen(float x, float y) {
-	//if (x > -(win_width / 2.0f) && x < win_width / 2.0f && y > -(win_height / 2.0f) && y < win_height / 2.0f)
-		//return 0;
-
 	if (y > win_height / 2.0f - 20) return 1;
 	if (x > win_width / 2.0f - 20) return 2;
 	if (y < -(win_height / 2.0f) + 20) return 3;
@@ -1113,7 +1125,7 @@ void timer_scene(int timestamp_scene) {
 	// CARS
 	float car_reflect_angle;
 	if (!flyAway) {
-		if ( collisionDetected(car1_x - car2_x, 0, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f) ) {
+		if ( collisionDetected(car1_x - car2_x, 0, car1_width / 2.0f, car2_width / 2.0f) ) {
 			car_scale_ratio -= ((1.0f / 3.0f) / ((car1_width / 3.0f) / 10)) ;
 			car2_x -= 10;
 		}
@@ -1311,39 +1323,41 @@ void timer_scene(int timestamp_scene) {
 
 
 	// CUSTOMIZE OBJECT
-	face_angle = (face_angle + 5) % 360;
-	int face_hit_wall;
-	float face_ro, face_grad;
-	for (int i = 0; i < face_num; i++) {
-		face_x[i] += 10 * cos(face_rotate[i] * TO_RADIAN);
-		face_y[i] = tan(face_rotate[i] * TO_RADIAN) * (face_x[i] - x_basis[i]) + y_basis[i];
-		face_hit_wall = outOfScreen(face_x[i], face_y[i]);
-		if (face_hit_wall) {
-			face_ro = rand() % 60;
+	if (FACE_BUTTON) {
+		face_angle = (face_angle + 5) % 360;
+		int face_hit_wall;
+		float face_ro, face_grad;
+		for (int i = 0; i < face_num; i++) {
+			face_x[i] += 10 * cos(face_rotate[i] * TO_RADIAN);
+			face_y[i] = tan(face_rotate[i] * TO_RADIAN) * (face_x[i] - x_basis[i]) + y_basis[i];
+			face_hit_wall = outOfScreen(face_x[i], face_y[i]);
+			if (face_hit_wall) {
+				face_ro = rand() % 60;
 
 
-			switch (face_hit_wall) {
-			case 1:
-				if (face_rotate[i] < 90) face_ro = 360 - face_ro;
-				else face_ro += 180;
-				break;
-			case 2:
-				if (face_rotate[i] < 90) face_ro = 180 - face_ro;
-				else face_ro += 180;
-				break;
-			case 3:
-				if (face_rotate[i] < 270) face_ro = 180 - face_ro;
-				else face_ro = face_ro;
-				break;
-			case 4:
-				if (face_rotate[i] < 180) face_ro = face_ro;
-				else face_ro = 360 - face_ro;
-				break;
+				switch (face_hit_wall) {
+				case 1:
+					if (face_rotate[i] < 90) face_ro = 360 - face_ro;
+					else face_ro += 180;
+					break;
+				case 2:
+					if (face_rotate[i] < 90) face_ro = 180 - face_ro;
+					else face_ro += 180;
+					break;
+				case 3:
+					if (face_rotate[i] < 270) face_ro = 180 - face_ro;
+					else face_ro = face_ro;
+					break;
+				case 4:
+					if (face_rotate[i] < 180) face_ro = face_ro;
+					else face_ro = 360 - face_ro;
+					break;
+				}
+				face_prev_rotate[i] = face_rotate[i];
+				face_rotate[i] = face_ro;
+				x_basis[i] = face_x[i];
+				y_basis[i] = face_y[i];
 			}
-			face_prev_rotate[i] = face_rotate[i];
-			face_rotate[i] = face_ro;
-			x_basis[i] = face_x[i];
-			y_basis[i] = face_y[i];
 		}
 	}
 
@@ -1383,6 +1397,24 @@ void cleanup(void) {
 	glDeleteBuffers(1, &VBO_airplane);
 
 	// Delete others here too!!!
+	glDeleteVertexArrays(1, &VAO_house);
+	glDeleteBuffers(1, &VBO_house);
+	
+	glDeleteVertexArrays(1, &VAO_car);
+	glDeleteBuffers(1, &VBO_car);
+
+	glDeleteVertexArrays(1, &VAO_car2);
+	glDeleteBuffers(1, &VBO_car2);
+
+	glDeleteVertexArrays(1, &VAO_cocktail);
+	glDeleteBuffers(1, &VBO_cocktail);
+
+	glDeleteVertexArrays(1, &VAO_face);
+	glDeleteBuffers(1, &VBO_face);
+
+	glDeleteVertexArrays(1, &VAO_face_angry);
+	glDeleteBuffers(1, &VBO_face_angry);
+	
 }
 
 void register_callbacks(void) {
