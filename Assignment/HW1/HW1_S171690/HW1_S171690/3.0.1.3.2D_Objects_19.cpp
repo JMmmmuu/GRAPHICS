@@ -180,6 +180,73 @@ void draw_face() { // Draw airplane in its MC.
 	glBindVertexArray(0);
 }
 
+// ANGRY
+#define FACE_ANGRY 0
+#define FACE_ANGRY_LEFT_EYE 1
+#define FACE_ANGRY_RIGHT_EYE 2
+#define FACE_ANGRY_MOUTH 3
+GLfloat face_angry[360][2];
+GLfloat angry_left_eye[4][2] = { { -14.0, 12.0 },{ -10.5, 15.5 },{ -1.0, 5.5 },{ -4.5, 2.0 } };
+GLfloat angry_right_eye[4][2] = { { 4.0, 5.5 },{ 7.5, 2.0 },{ 16.0, 12.0 },{ 12.5, 15.5 } };
+GLfloat angry_mouth[4][2] = { { -10.0, -16.0 },{ -10.0, -10.0 },{ 10.0, -10.0 },{ 10.0, -16.0 } };
+GLfloat face_angry_colors[4][3] = {
+	{ 255 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+{ 0 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+{ 0 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+{ 0 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+};
+
+GLuint VBO_face_angry, VAO_face_angry;
+
+void prepare_face_angry() {
+	GLsizeiptr buffer_size = sizeof(face_angry) + sizeof(angry_left_eye) + sizeof(angry_right_eye) + sizeof(angry_mouth);
+
+	for (int i = 0; i < 360; i++) {
+		face_angry[i][0] = 30 * cos(i);
+		face_angry[i][1] = 30 * sin(i);
+	}
+
+	// Initialize vertex buffer object.
+	glGenBuffers(1, &VBO_face_angry);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_face_angry);
+	glBufferData(GL_ARRAY_BUFFER, buffer_size, NULL, GL_STATIC_DRAW); // allocate buffer object memory
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(face_angry), face_angry);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(face_angry), sizeof(angry_left_eye), angry_left_eye);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(face_angry) + sizeof(angry_left_eye), sizeof(angry_right_eye), angry_right_eye);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(face_angry) + sizeof(angry_left_eye) + sizeof(angry_right_eye), sizeof(angry_mouth), angry_mouth);
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &VAO_face_angry);
+	glBindVertexArray(VAO_face_angry);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_face_angry);
+	glVertexAttribPointer(LOC_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_face_angry() { // Draw airplane in its MC.
+	glBindVertexArray(VAO_face_angry);
+
+	glUniform3fv(loc_primitive_color, 1, face_angry_colors[FACE_ANGRY]);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 360);
+
+	glUniform3fv(loc_primitive_color, 1, face_angry_colors[FACE_ANGRY_LEFT_EYE]);
+	glDrawArrays(GL_TRIANGLE_FAN, 360, 4);
+
+	glUniform3fv(loc_primitive_color, 1, face_angry_colors[FACE_ANGRY_RIGHT_EYE]);
+	glDrawArrays(GL_TRIANGLE_FAN, 364, 4);
+
+	glUniform3fv(loc_primitive_color, 1, face_angry_colors[FACE_ANGRY_MOUTH]);
+	glDrawArrays(GL_TRIANGLE_FAN, 368, 4);
+
+	glBindVertexArray(0);
+}
+
 #define AIRPLANE_BIG_WING 0
 #define AIRPLANE_SMALL_WING 1
 #define AIRPLANE_BODY 2
@@ -772,6 +839,9 @@ int face_rotate[FACE_NUM] = { 0, }, face_prev_rotate[FACE_NUM] = { 0, };
 int face_angle = 0;
 int face_num = 0, CREATED = 0;
 
+int ANGRY = 0;
+float angry_x = -((float)win_width / 2) - ((float)win_height / 2);
+
 void display(void) {
 	int i;
 	float x, r, s, delx, delr, dels;
@@ -788,11 +858,6 @@ void display(void) {
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// my Own Code
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 0.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_face();
-	drawPoint(100, 100);
 
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
@@ -960,6 +1025,18 @@ void display(void) {
 		}
 	}
 
+	// ANGRY
+	if (ANGRY) {
+		ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(angry_x, 0.0f, 0.0f));
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3((float)win_height / 2 / 30, (float)win_height / 2 / 30, 1.0f));
+		ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		draw_face_angry();
+	}
+
 
 	glFlush();
 }
@@ -987,6 +1064,8 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'l': case 'L':
 		isLine = isLine ? 0 : 1;
 		break;
+	case 'a': case 'A':
+		ANGRY = 1;
 	}
 }
 
@@ -994,13 +1073,13 @@ void reshape(int width, int height) {
 	win_width = width, win_height = height;
 	radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 	max_win_size = win_width < win_height ? win_width : win_height;
+	angry_x = -(float)win_width / 2 - (float)win_height / 2;
 
 	car1_width = win_width / 250.0f < 5 ? win_width / 250.05 : 5.0f;
 	car2_width = win_width / 250.0f < 5 ? win_width / 250.05 : 5.0f;
 	car1_width *= 16.0f;
 	car2_width *= 18.0f;
 
-	//car1_x = win_width / 3;// car2_x = win_width / 3;
 
 
 	glViewport(0, 0, win_width, win_height);
@@ -1268,6 +1347,27 @@ void timer_scene(int timestamp_scene) {
 		}
 	}
 
+	
+
+	if (ANGRY) {
+		angry_x += 8;
+		if (angry_x >= (float)win_width / 2 + (float)win_height / 2) {
+			ANGRY = 0;
+			angry_x = -((float)win_width / 2) - ((float)win_height / 2);
+		}
+		for (int i = 0; i < FACE_NUM; i++) {
+			if (collisionDetected(face_x[i] - angry_x, face_y[i], (float)win_height / 2, 30)) {
+				face_prev_rotate[i] = face_rotate[i];
+				x_basis[i] = face_x[i];
+				y_basis[i] = face_y[i];
+				if (face_y[i] > 0) face_rotate[i] = atan(face_y[i] / (face_x[i] - angry_x)) * TO_DEGREE;
+				else if (face_y[i] == 0) face_rotate[i] = 0;
+				else face_rotate[i] = face_rotate[i] = 360 - atan((-face_y[i]) / (face_x[i] - angry_x)) * TO_DEGREE;
+			}
+		}
+	}
+
+
 	glutPostRedisplay();
 	glutTimerFunc(40, timer_scene, 1);
 }
@@ -1326,6 +1426,7 @@ void prepare_scene(void) {
 	prepare_sword();
 
 	prepare_face();
+	prepare_face_angry();
 }
 
 void initialize_renderer(void) {
