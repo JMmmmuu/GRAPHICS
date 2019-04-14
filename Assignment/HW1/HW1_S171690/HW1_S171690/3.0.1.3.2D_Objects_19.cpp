@@ -1117,15 +1117,15 @@ int outOfScreen(float x, float y) {
 	return 0;
 }
 
+int car_reflect_angle = 0;
 void timer_scene(int timestamp_scene) {
 	// AIRPLANE
 	theta = (theta + 1) % 360;
 	float tmpX = car1_x, tmpY = car1_y;
 
 	// CARS
-	float car_reflect_angle;
 	if (!flyAway) {
-		if ( collisionDetected(car1_x - car2_x, 0, car1_width / 2.0f, car2_width / 2.0f) ) {
+		if ( collisionDetected(car1_x - car2_x, 0, car1_width, car2_width) ) {
 			car_scale_ratio -= ((1.0f / 3.0f) / ((car1_width / 3.0f) / 10)) ;
 			car2_x -= 10;
 		}
@@ -1137,74 +1137,78 @@ void timer_scene(int timestamp_scene) {
 			tmpX = car1_x;
 			tmpY = car1_y;
 
-			grad = rand() % 2 + 1 - rand() / (float)RAND_MAX;
-			car_reflect_angle = atan(grad);
-			grad = rand() % 2 == 0 ? grad : -grad;
+			car_reflect_angle = rand() % 60;
+			car_reflect_angle = rand() % 2 ? 180 - car_reflect_angle : 180 + car_reflect_angle;
+			grad = tan(car_reflect_angle * TO_RADIAN);
+			fprintf(stdout, "%f %f %d %f\n", car1_x, car1_y, car_reflect_angle, grad);
 
-			//fprintf(stdout, "%f %f\n", grad, (30.0f * abs(cos(car_reflect_angle))));
 		}
 	}
 	else {
 		flyRotate = (flyRotate + 50) % 360;
-		int prevWall, prevGrad;
+		int prevWall;
 		switch (flyOrder) {
 		case 0:
-			car1_x -= (30.0f * abs(cos(car_reflect_angle)));
+			car1_x += 30.0f * cos(car_reflect_angle * TO_RADIAN);
 			car1_y = grad * (car1_x - tmpX) + tmpY;
+			fprintf(stdout, "%f %f %d %f\n", car1_x, car1_y, car_reflect_angle, grad);
+
 			if ((hitWall = outOfScreen(car1_x, car1_y)) ) {
 				flyOrder = (flyOrder + 1) % 3;
 				tmpX = car1_x;
 				tmpY = car1_y;
-				prevGrad = grad;
-				grad = rand() % 2 + 1 - (float)rand() / RAND_MAX;
-				car_reflect_angle = atan(grad);
 
-				if (hitWall == 3) grad *= -1;
-				else if (hitWall == 4 && prevGrad > 0) grad *= -1;
-\
-				fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
+				car_reflect_angle = rand() % 60;
+
+				if (hitWall == 1) car_reflect_angle = 180 + car_reflect_angle;
+				if (hitWall == 3) car_reflect_angle = 360 - car_reflect_angle;
+				else if (hitWall == 4 && grad > 0) car_reflect_angle = 360 - car_reflect_angle;
+
+				grad = tan(car_reflect_angle * TO_RADIAN);
+
+				fprintf(stdout, "%f %f\n", car1_x, car1_y);
+				//fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
 			}
 			break;
 		case 1:
-			switch (hitWall) {
-				case 1: case 3:
-				car1_x -= (30.0f * abs(cos(car_reflect_angle)));
-				break;
-			default:
-				car1_x += (30.0f * abs(cos(car_reflect_angle)));
-			}
+			car1_x += 30.0f * cos(car_reflect_angle * TO_RADIAN);
+			
 			prevWall = hitWall;
 			car1_y = grad * (car1_x - tmpX) + tmpY;
 			if ( (hitWall = outOfScreen(car1_x, car1_y)) > 0 ) {
 				flyOrder = (flyOrder + 1) % 3;
 				tmpX = car1_x;
 				tmpY = car1_y;
-				prevGrad = grad;
-				grad = rand() % 2 + 1 - (float)rand() / RAND_MAX;
-				car_reflect_angle = atan(grad);
 
-				if (hitWall == 4 && prevGrad > 0) grad *= -1;
-				else if (hitWall == 2 && prevGrad > 0) grad *= -1;
-				else if (hitWall == 1) {
-					if (prevWall == 4) grad *= -1;
-					else if (prevWall == 3 && prevGrad > 0) grad *= -1;
+				car_reflect_angle = rand() % 60;
+
+
+				switch (hitWall) {
+				case 1:
+					if (grad > 0) car_reflect_angle = 360 - car_reflect_angle;
+					else car_reflect_angle += 180;
+					break;
+				case 2:
+					if (grad > 0) car_reflect_angle = 180 - car_reflect_angle;
+					else car_reflect_angle += 180;
+					break;
+				case 3:
+					if (grad > 0) car_reflect_angle = 180 - car_reflect_angle;
+					else car_reflect_angle = car_reflect_angle;
+					break;
+				case 4:
+					if (grad < 0) car_reflect_angle = car_reflect_angle;
+					else car_reflect_angle = 360 - car_reflect_angle;
+					break;
 				}
-				else if (hitWall == 3) {
-					if (prevWall == 2) grad *= -1;
-					else if (prevWall == 1 && prevGrad > 0) grad *= -1;
-				}
+				grad = tan(car_reflect_angle * TO_RADIAN);
 
 				fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
 			}
 			break;
 		case 2:
-			switch (hitWall) {
-			case 1: case 3: case 4:
-				car1_x += (30.0f * abs(cos(car_reflect_angle)));
-				break;
-			default:
-				car1_x -= (30.0f * abs(cos(car_reflect_angle)));
-			}
+			car1_x += 30.0f * cos(car_reflect_angle * TO_RADIAN);
+
 			car1_y = grad * (car1_x - tmpX) + tmpY;
 			if (outOfScreen(car1_x, car1_y) > 0) {
 				flyOrder = (flyOrder + 1) % 3;
