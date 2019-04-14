@@ -852,15 +852,21 @@ float max_win_size = win_width < win_height ? win_width : win_height;
 float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 int collisionDetected(float distX, float distY, float xRadius, float yRadius);
 void drawLine(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2);
+void drawPoint(GLfloat x1, GLfloat y1);
 
 // AIRPLANE FACTORS
-int airplane_angle = 0;
+int theta = 0;
 
 // CAR FACTORS
 float car_scale_ratio = 1.0f;
 float car_trans_ratio = 0;
-float car1_x = -(win_width / 3);
+float car1_x = -(win_width / 3), car1_y = 50;
 float car2_x = win_width / 3;
+
+int flyAway = 0;
+int flyOrder = 0;
+int flyRotate = 0;
+float grad;
 
 // HOUSE FACTORS
 float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
@@ -949,12 +955,19 @@ void display(void) {
 
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
-	air_x = radius * sin(5 * airplane_angle * TO_RADIAN) * cos(airplane_angle * TO_RADIAN);
-	air_y = radius * sin(5 + airplane_angle * TO_RADIAN) * sin(airplane_angle * TO_RADIAN);
+	float ra;
+	ra = radius * sin(5 * theta * TO_RADIAN);
+	air_x = ra * cos(theta * TO_RADIAN);
+	air_y = ra * sin(theta * TO_RADIAN);
+
+	drawLine(air_x, air_y, air_x+1, air_y+1);
+	//float air_angle = (90 + theta) * TO_RADIAN; 
+	float air_angle = atan(1.0f / 5.0f / radius / cos(5 * theta)) + 90 * TO_RADIAN;
+	//fprintf(stdout, "%f\n", 1.0f / 5.0f / radius / cos(5 * theta));
 
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(air_x, air_y, 0.0f));
-	ModelMatrix = glm::rotate(ModelMatrix, (90 + airplane_angle) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelMatrix = glm::rotate(ModelMatrix, air_angle, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_airplane();
@@ -962,21 +975,25 @@ void display(void) {
 
 	// 2) CAR TRANSFORMATION - TRANSLATION & ROTATION
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(-(win_width / 3), 50.0f, 0.0f));
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(car1_x, car1_y, 0.0f));
 
+	ModelMatrix = glm::rotate(ModelMatrix, flyRotate * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(car_scale_ratio, 1.0f, 1.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(win_width / 250, win_width / 250, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(win_width / 250.0f, win_width / 250.0f, 1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car();
+	drawLine(car1_x + 16 * win_width / 250.0f, -300, car1_x + 16 * win_width / 250.0f, 300);
 	//
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(car2_x, 50.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(win_width / 250, win_width / 250, 1.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(win_width / 250.0f, win_width / 250.0f, 1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car2();
+	drawLine(car2_x - 18 * win_width / 250.0f, -300, car2_x - 18 * win_width / 250.0f, 300);
+
 
 
 	// 3) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
@@ -1058,8 +1075,6 @@ void display(void) {
 	draw_cocktail();
 
 
-
-
 	glFlush();
 }
 
@@ -1095,6 +1110,24 @@ void drawLine(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) {
 	glBindVertexArray(0);
 }
 
+void drawPoint(GLfloat x1, GLfloat y1) {
+	//clear color and depth buffer 
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();//load identity matrix
+
+	glTranslatef(0.0f, 0.0f, -4.0f);//move forward 4 units
+
+	glColor3f(0.0f, 0.0f, 1.0f); //blue color
+
+	glPointSize(10.0f);//set point size to 10 pixels
+
+	glBegin(GL_POINTS); //starts drawing of points
+	glVertex3f(1.0f, 1.0f, 0.0f);//upper-right corner
+	glVertex3f(-1.0f, -1.0f, 0.0f);//lower-left corner
+	glEnd();//end drawing of points
+
+}
+
 glm::mat4 initTransform(glm::mat4 ModelMatrix) {
 	glm::vec3 cock_co = glm::vec3(cock_timer_x, cock_timer_y, 0.0f);
 	ModelMatrix = glm::translate(ModelMatrix, cock_co);
@@ -1104,7 +1137,7 @@ glm::mat4 initTransform(glm::mat4 ModelMatrix) {
 
 int collisionDetected(float distX, float distY, float xRadius, float yRadius) {
 	float dist = sqrt(distX * distX + distY + distY);
-	fprintf(stdout, "%f %f\n", dist, xRadius + yRadius);
+	//(stdout, "%f %f\n", dist, xRadius + yRadius);
 	if (dist <= xRadius + yRadius)
 		return 1;
 	return 0;
@@ -1140,24 +1173,75 @@ void reshape(int width, int height) {
 	glutPostRedisplay();
 }
 
+int outOfScreen(float x1, float y1) {
+	if (x1 > -(win_width / 2.0f) && x1 < win_width / 2.0f && y1 > -(win_height / 2.0f) && y1 < win_height / 2.0f)
+		return 0;
+	else
+		return 1;
+}
+int tmp;
 void timer_scene(int timestamp_scene) {
 	// AIRPLANE
-	airplane_angle = (airplane_angle + 5) % 360;
+	theta = (theta + 1) % 360;
 
 	// CARS
 	float car_shearing_ratio = 0;
 	float car_trans_ratio = 0;
 
-	car2_x -= 20;
-	if (car1_x - car2_x <= 16.0f * (float)win_width / 250.0f + 18.0f * (float)win_width / 250.0f) {
-	//if (collisionDetected(car1_x - car2_x, 0, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f)) {
-		car_scale_ratio -= 0.1f;
+	int dmdkr;
+
+	if (!flyAway) {
+		car2_x -= 20;
+		if (collisionDetected(car1_x - car2_x, 0, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f)) {
+			car_scale_ratio -= 0.06f;
+			car2_x += 10;
+		}
+		if (car2_x <= car1_x + 16 * win_width / 250.0f) {
+			flyAway = 1;
+			tmp = car1_x;
+			grad = tan(rand() % 360 * TO_RADIAN);
+		}
 	}
-	if (car2_x <= car1_x) {
-		car2_x = win_width / 3;
-		car_scale_ratio = 1.0f;
+	else {
+		switch (flyOrder) {
+		case 0:
+			car1_x -= 30;
+			flyRotate = (flyRotate + 40) % 360;
+			car1_y = grad * (car1_x - tmp);
+			if (outOfScreen(car1_x, car1_y)) {
+				flyOrder = (flyOrder + 1) % 3;
+				tmp = car1_y;
+				grad = tan(rand() % 360 * TO_RADIAN);
+				//fprintf(stdout, "%d\n", grad);
+			}
+			break;
+		case 1:
+			car1_x += 30;
+			flyRotate = (flyRotate + 30) % 360;
+			car1_y = grad * car1_x + tmp;
+			if (outOfScreen(car1_x, car1_y)) {
+				flyOrder = (flyOrder + 1) % 3;
+				tmp = car1_x;
+				grad = tan(rand() % 360 * TO_RADIAN);
+				//fprintf(stdout, "%d\n", grad);
+			}
+			break;
+		case 2:
+			car1_x += 30;
+			flyRotate = (flyRotate + 30) % 360;
+			car1_y = grad * (car1_x - tmp);
+			if (outOfScreen(car1_x, car1_y)) {
+				flyOrder = (flyOrder + 1) % 3;
+				car1_x = -(win_width / 3.0f);
+				car1_y = 50.0f;
+				car2_x = win_width / 3.0f;
+				car_scale_ratio = 1.0f;
+				flyRotate = 0;
+				flyAway = 0;
+			}
+			break;
+		}
 	}
-	fprintf(stdout, "%f %f  %d  %f %f\n", car1_x, car2_x, win_width, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f);
 
 	// HOUSE
 	switch (house_trans_order) {
