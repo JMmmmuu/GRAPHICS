@@ -1323,6 +1323,25 @@ void timer_scene(int timestamp_scene) {
 
 
 	// CUSTOMIZE OBJECT
+
+	if (ANGRY) {
+		angry_x += 8;
+		if (angry_x >= (float)win_width / 2 + (float)win_height / 2) {
+			ANGRY = 0;
+			angry_x = -((float)win_width / 2) - ((float)win_height / 2);
+		}
+		for (int i = 0; i < FACE_NUM; i++) {
+			if (collisionDetected(face_x[i] - angry_x, face_y[i], (float)win_height / 2, 30)) {
+				face_prev_rotate[i] = face_rotate[i];
+				x_basis[i] = face_x[i];
+				y_basis[i] = face_y[i];
+				if (face_y[i] > 0) face_rotate[i] = atan(face_y[i] / (face_x[i] - angry_x)) * TO_DEGREE;
+				else if (face_y[i] == 0) face_rotate[i] = 0;
+				else face_rotate[i] = face_rotate[i] = 360 - atan((-face_y[i]) / (face_x[i] - angry_x)) * TO_DEGREE;
+			}
+		}
+	}
+
 	if (FACE_BUTTON) {
 		face_angle = (face_angle + 5) % 360;
 		int face_hit_wall;
@@ -1334,7 +1353,6 @@ void timer_scene(int timestamp_scene) {
 			if (face_hit_wall) {
 				face_ro = rand() % 60;
 
-
 				switch (face_hit_wall) {
 				case 1:
 					if (face_rotate[i] < 90) face_ro = 360 - face_ro;
@@ -1343,6 +1361,11 @@ void timer_scene(int timestamp_scene) {
 				case 2:
 					if (face_rotate[i] < 90) face_ro = 180 - face_ro;
 					else face_ro += 180;
+
+					if (ANGRY && (angry_x >= win_width / 2.0f / 5.0f)) {
+						x_basis[i] -= win_width;
+						face_x[i] -= win_width;
+					}
 					break;
 				case 3:
 					if (face_rotate[i] < 270) face_ro = 180 - face_ro;
@@ -1363,23 +1386,7 @@ void timer_scene(int timestamp_scene) {
 
 	
 
-	if (ANGRY) {
-		angry_x += 8;
-		if (angry_x >= (float)win_width / 2 + (float)win_height / 2) {
-			ANGRY = 0;
-			angry_x = -((float)win_width / 2) - ((float)win_height / 2);
-		}
-		for (int i = 0; i < FACE_NUM; i++) {
-			if (collisionDetected(face_x[i] - angry_x, face_y[i], (float)win_height / 2, 30)) {
-				face_prev_rotate[i] = face_rotate[i];
-				x_basis[i] = face_x[i];
-				y_basis[i] = face_y[i];
-				if (face_y[i] > 0) face_rotate[i] = atan(face_y[i] / (face_x[i] - angry_x)) * TO_DEGREE;
-				else if (face_y[i] == 0) face_rotate[i] = 0;
-				else face_rotate[i] = face_rotate[i] = 360 - atan((-face_y[i]) / (face_x[i] - angry_x)) * TO_DEGREE;
-			}
-		}
-	}
+
 
 
 	glutPostRedisplay();
