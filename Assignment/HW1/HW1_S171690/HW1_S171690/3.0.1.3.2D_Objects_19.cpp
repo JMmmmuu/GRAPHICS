@@ -114,6 +114,72 @@ void draw_line(void) { // Draw line in its MC.
 	glBindVertexArray(0);
 }
 
+#define FACE 0
+#define FACE_LEFT_EYE 1
+#define FACE_RIGHT_EYE 2
+#define FACE_MOUTH 3
+GLfloat face[360][2];
+GLfloat left_eye[4][2] = { { -15.0, 7.0 }, { -15.0, 12.0 }, { -5.0, 12.0 }, { -5.0, 7.0 } };
+GLfloat right_eye[4][2] = { { 5.0, 7.0 },{ 5.0, 12.0 },{ 15.0, 12.0 },{ 15.0, 7.0 } };
+GLfloat mouth[4][2] = { { -10.0, -16.0 }, { -10.0, -10.0 }, { 10.0, -10.0 }, { 10.0, -16.0 } };
+GLfloat face_colors[4][3] = {
+	{ 255 / 255.0f, 255 / 255.0f, 255 / 255.0f },
+	{ 0 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+	{ 0 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+	{ 0 / 255.0f, 0 / 255.0f, 0 / 255.0f },
+};
+
+GLuint VBO_face, VAO_face;
+
+void prepare_face() {
+	GLsizeiptr buffer_size = sizeof(face) + sizeof(left_eye) + sizeof(right_eye) + sizeof(mouth);
+
+	for (int i = 0; i < 360; i++) {
+		face[i][0] = 30 * cos(i);
+		face[i][1] = 30 * sin(i);
+	}
+
+	// Initialize vertex buffer object.
+	glGenBuffers(1, &VBO_face);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_face);
+	glBufferData(GL_ARRAY_BUFFER, buffer_size, NULL, GL_STATIC_DRAW); // allocate buffer object memory
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(face), face);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(face), sizeof(left_eye), left_eye);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(face) + sizeof(left_eye), sizeof(right_eye), right_eye);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(face) + sizeof(left_eye) + sizeof(right_eye), sizeof(mouth), mouth);
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &VAO_face);
+	glBindVertexArray(VAO_face);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_face);
+	glVertexAttribPointer(LOC_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_face() { // Draw airplane in its MC.
+	glBindVertexArray(VAO_face);
+
+	glUniform3fv(loc_primitive_color, 1, face_colors[FACE]);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 360);
+
+	glUniform3fv(loc_primitive_color, 1, face_colors[FACE_LEFT_EYE]);
+	glDrawArrays(GL_TRIANGLE_FAN, 360, 4);
+
+	glUniform3fv(loc_primitive_color, 1, face_colors[FACE_RIGHT_EYE]);
+	glDrawArrays(GL_TRIANGLE_FAN, 364, 4);
+
+	glUniform3fv(loc_primitive_color, 1, face_colors[FACE_MOUTH]);
+	glDrawArrays(GL_TRIANGLE_FAN, 368, 4);
+
+	glBindVertexArray(0);
+}
+
 #define AIRPLANE_BIG_WING 0
 #define AIRPLANE_SMALL_WING 1
 #define AIRPLANE_BODY 2
@@ -898,61 +964,15 @@ void display(void) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_axes();
 
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-500.0f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_airplane();
 
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-300.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_shirt();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_house();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_car();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(300.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_cocktail();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(500.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_car2();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -100.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_hat();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-400.0f, -100.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(5.0f, 5.0f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_cake();
-
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(400.0f, -100.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(3.5f, 3.5f, 1.0f));
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_sword();
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// my Own Code
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 0.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_face();
+	drawPoint(100, 100);
 
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
@@ -1001,6 +1021,8 @@ void display(void) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car2();
 	drawLine(car2_x - car2_width, -300, car2_x - car2_width, 300);
+
+
 
 
 
@@ -1463,6 +1485,8 @@ void prepare_scene(void) {
 	prepare_hat();
 	prepare_cake();
 	prepare_sword();
+
+	prepare_face();
 }
 
 void initialize_renderer(void) {
