@@ -959,9 +959,6 @@ void display(void) {
 			draw_face();
 		}
 	}
-	fprintf(stdout, "%d %d %d\n", face_num, face_angle, CREATED);
-
-
 
 
 	glFlush();
@@ -1053,7 +1050,7 @@ void timer_scene(int timestamp_scene) {
 			car_reflect_angle = atan(grad);
 			grad = rand() % 2 == 0 ? grad : -grad;
 
-			fprintf(stdout, "%f %f\n", grad, (30.0f * abs(cos(car_reflect_angle))));
+			//fprintf(stdout, "%f %f\n", grad, (30.0f * abs(cos(car_reflect_angle))));
 		}
 	}
 	else {
@@ -1239,8 +1236,8 @@ void timer_scene(int timestamp_scene) {
 	int face_hit_wall;
 	float face_ro, face_grad;
 	for (int i = 0; i < face_num; i++) {
-		face_x[i] += 10 * cos(face_rotate[i]);
-		face_y[i] = tan(face_rotate[i]) * (face_x[i] - x_basis[i]) + y_basis[i];
+		face_x[i] += 10 * cos(face_rotate[i] * TO_RADIAN);
+		face_y[i] = tan(face_rotate[i] * TO_RADIAN) * (face_x[i] - x_basis[i]) + y_basis[i];
 		face_hit_wall = outOfScreen(face_x[i], face_y[i]);
 		if (face_hit_wall) {
 			face_ro = rand() % 60;
@@ -1248,19 +1245,19 @@ void timer_scene(int timestamp_scene) {
 
 			switch (face_hit_wall) {
 			case 1:
-				if (face_prev_rotate[i] < 90) face_ro = 360 - face_ro;
+				if (face_rotate[i] < 90) face_ro = 360 - face_ro;
 				else face_ro += 180;
 				break;
 			case 2:
-				if (face_prev_rotate[i] < 90) face_ro = 180 - face_ro;
+				if (face_rotate[i] < 90) face_ro = 180 - face_ro;
 				else face_ro += 180;
 				break;
 			case 3:
-				if (face_prev_rotate[i] < 270) face_ro = 180 - face_ro;
-				else face_ro = 360 - face_ro;
+				if (face_rotate[i] < 270) face_ro = 180 - face_ro;
+				else face_ro = face_ro;
 				break;
 			case 4:
-				if (face_prev_rotate[i] < 180) face_ro = face_ro;
+				if (face_rotate[i] < 180) face_ro = face_ro;
 				else face_ro = 360 - face_ro;
 				break;
 			}
@@ -1270,10 +1267,6 @@ void timer_scene(int timestamp_scene) {
 			y_basis[i] = face_y[i];
 		}
 	}
-
-
-
-
 
 	glutPostRedisplay();
 	glutTimerFunc(40, timer_scene, 1);
