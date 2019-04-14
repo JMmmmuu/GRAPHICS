@@ -860,9 +860,10 @@ int theta = 0;
 // CAR FACTORS
 float car_scale_ratio = 1.0f;
 float car1_x = -(win_width / 3), car1_y = 50;
-float car2_x = win_width / 3;
+float car2_x = win_width / 3, car2_y = 50;
 float car1_width, car2_width;
 
+int hitWall = 0;
 int flyAway = 0;
 int flyOrder = 0;
 int flyRotate = 0;
@@ -994,7 +995,7 @@ void display(void) {
 	//
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(car2_x, 50.0f, 0.0f));
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(car2_x, car2_y, 0.0f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(car2_width / 18.0f, car2_width / 18.0f, 1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
@@ -1186,63 +1187,107 @@ void reshape(int width, int height) {
 }
 
 int outOfScreen(float x, float y) {
-	if (x > -(win_width / 2.0f) && x < win_width / 2.0f && y > -(win_height / 2.0f) && y < win_height / 2.0f)
-		return 0;
+	//if (x > -(win_width / 2.0f) && x < win_width / 2.0f && y > -(win_height / 2.0f) && y < win_height / 2.0f)
+		//return 0;
 
 	if (y > win_height / 2.0f) return 1;
-	else if (x < win_width / 2.0f) return 2;
-	else if (y < win_height / 2.0f) return 3;
-	else return 4;
+	if (x > win_width / 2.0f) return 2;
+	if (y < -(win_height / 2.0f)) return 3;
+	if (x < -(win_width / 2.0f)) return 4;
 
+	return 0;
 }
 
-int tmp;
 void timer_scene(int timestamp_scene) {
 	// AIRPLANE
 	theta = (theta + 1) % 360;
-	int hitWall;
+	float tmpX = car1_x, tmpY = car1_y;
 
 	// CARS
+	float car_reflect_angle;
 	if (!flyAway) {
-		if ( (hitWall = collisionDetected(car1_x - car2_x, 0, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f)) ) {
+		if ( collisionDetected(car1_x - car2_x, 0, 16.0f * (float)win_width / 250.0f, 18.0f * (float)win_width / 250.0f) ) {
 			car_scale_ratio -= ((1.0f / 3.0f) / ((car1_width / 3.0f) / 10)) ;
 			car2_x -= 10;
 		}
 		else car2_x -= 20;
 
-		if ((car2_x - car2_width / 2.0f) - (car1_x + car1_width / 2.0f) <= car1_width / 2.0f / 3.0f) {
+		if ((car2_x - car2_width / 2.0f) - (car1_x + car1_width / 2.0f) <= car1_width / 3.0f) {
 			flyAway = 1;
-			tmp = car1_x;
-			grad = tan(rand() % 360 * TO_RADIAN);
+			flyOrder = 0;
+			tmpX = car1_x;
+			tmpY = car1_y;
+
+			grad = rand() % 2 + 1 - rand() / (float)RAND_MAX;
+			car_reflect_angle = atan(grad);
+			grad = rand() % 2 == 0 ? grad : -grad;
+
+			fprintf(stdout, "%f %f\n", grad, (30.0f * abs(cos(car_reflect_angle))));
 		}
 	}
 	else {
-		flyRotate = (flyRotate + 40) % 360;
+		flyRotate = (flyRotate + 50) % 360;
+		int prevWall, prevGrad;
 		switch (flyOrder) {
 		case 0:
-			car1_x -= 30;
-			car1_y = grad * (car1_x - tmp);
-			if (outOfScreen(car1_x, car1_y)) {
+			car1_x -= (30.0f * abs(cos(car_reflect_angle)));
+			car1_y = grad * (car1_x - tmpX) + tmpY;
+			if ((hitWall = outOfScreen(car1_x, car1_y)) ) {
 				flyOrder = (flyOrder + 1) % 3;
-				tmp = car1_y;
-				grad = tan(rand() % 360 * TO_RADIAN);
-				//fprintf(stdout, "%d\n", grad);
+				tmpX = car1_x;
+				tmpY = car1_y;
+				prevGrad = grad;
+				grad = rand() % 2 + 1 - (float)rand() / RAND_MAX;
+				car_reflect_angle = atan(grad);
+
+				if (hitWall == 3) grad *= -1;
+				else if (hitWall == 4 && prevGrad > 0) grad *= -1;
+\
+				fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
 			}
 			break;
 		case 1:
-			car1_x += 30;
-			car1_y = grad * car1_x + tmp;
-			if (outOfScreen(car1_x, car1_y)) {
+			switch (hitWall) {
+				case 1: case 3:
+				car1_x -= (30.0f * abs(cos(car_reflect_angle)));
+				break;
+			default:
+				car1_x += (30.0f * abs(cos(car_reflect_angle)));
+			}
+			prevWall = hitWall;
+			car1_y = grad * (car1_x - tmpX) + tmpY;
+			if ( (hitWall = outOfScreen(car1_x, car1_y)) > 0 ) {
 				flyOrder = (flyOrder + 1) % 3;
-				tmp = car1_x;
-				grad = tan(rand() % 360 * TO_RADIAN);
-				//fprintf(stdout, "%d\n", grad);
+				tmpX = car1_x;
+				tmpY = car1_y;
+				prevGrad = grad;
+				grad = rand() % 2 + 1 - (float)rand() / RAND_MAX;
+				car_reflect_angle = atan(grad);
+
+				if (hitWall == 4 && prevGrad > 0) grad *= -1;
+				else if (hitWall == 2 && prevGrad > 0) grad *= -1;
+				else if (hitWall == 1) {
+					if (prevWall == 4) grad *= -1;
+					else if (prevWall == 3 && prevGrad > 0) grad *= -1;
+				}
+				else if (hitWall == 3) {
+					if (prevWall == 2) grad *= -1;
+					else if (prevWall == 1 && prevGrad > 0) grad *= -1;
+				}
+
+				fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
 			}
 			break;
 		case 2:
-			car1_x += 30;
-			car1_y = grad * (car1_x - tmp);
-			if (outOfScreen(car1_x, car1_y)) {
+			switch (hitWall) {
+			case 1: case 3: case 4:
+				car1_x += (30.0f * abs(cos(car_reflect_angle)));
+				break;
+			default:
+				car1_x -= (30.0f * abs(cos(car_reflect_angle)));
+			}
+			car1_y = grad * (car1_x - tmpX) + tmpY;
+			if (outOfScreen(car1_x, car1_y) > 0) {
 				flyOrder = (flyOrder + 1) % 3;
 				car1_x = -(win_width / 3.0f);
 				car1_y = 50.0f;
@@ -1250,6 +1295,7 @@ void timer_scene(int timestamp_scene) {
 				car_scale_ratio = 1.0f;
 				flyRotate = 0;
 				flyAway = 0;
+				fprintf(stdout, "\n\n");
 			}
 			break;
 		}
