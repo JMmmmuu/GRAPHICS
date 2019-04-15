@@ -743,64 +743,87 @@ void draw_sword() {
 	glBindVertexArray(0);
 }
 
+GLuint VBO_cu_line, VAO_cu_line;
+GLfloat cu_line[2][2];
 void drawLine(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) {
-	GLuint VBO_line, VAO_line;
-	GLfloat line[2][2];
-	line[0][0] = x1; line[0][1] = y1;
-	line[1][0] = x2; line[1][1] = y2;
+	cu_line[0][0] = x1; cu_line[0][1] = y1;
+	cu_line[1][0] = x2; cu_line[1][1] = y2;
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 
-	glGenBuffers(1, &VBO_line);
+	glGenBuffers(1, &VBO_cu_line);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_line);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_cu_line);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cu_line), cu_line, GL_STATIC_DRAW);
 
-	glGenVertexArrays(1, &VAO_line);
-	glBindVertexArray(VAO_line);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(cu_line), cu_line);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO_line);
+	glGenVertexArrays(1, &VAO_cu_line);
+	glBindVertexArray(VAO_cu_line);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_cu_line);
 	glVertexAttribPointer(LOC_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	glUniform3fv(loc_primitive_color, 1, axes_color);
-	glBindVertexArray(VAO_line);
+	GLfloat color[3] = { 0.0f, 1.0f, 0.0f };
+	glUniform3fv(loc_primitive_color, 1, color);
+	glBindVertexArray(VAO_cu_line);
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 
 	glBindVertexArray(0);
 }
 
-void drawPoint(GLfloat x1, GLfloat y1) {
-	//clear color and depth buffer 
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();//load identity matrix
+GLuint VBO_point, VAO_point;
+GLfloat point[2];
+void preparePoint() {
+	glGenBuffers(1, &VBO_point);
 
-	glTranslatef(0.0f, 0.0f, -4.0f);//move forward 4 units
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_point);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(point), NULL, GL_STATIC_DRAW);
 
-	glColor3f(0.0f, 0.0f, 1.0f); //blue color
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(point), point);
 
-	glPointSize(10.0f);//set point size to 10 pixels
+	glGenVertexArrays(1, &VAO_point);
+	glBindVertexArray(VAO_point);
 
-	glBegin(GL_POINTS); //starts drawing of points
-	glVertex3f(1.0f, 1.0f, 0.0f);//upper-right corner
-	glVertex3f(-1.0f, -1.0f, 0.0f);//lower-left corner
-	glEnd();//end drawing of points
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_point);
+	glVertexAttribPointer(LOC_VERTEX, 2, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void drawPoint(GLfloat x, GLfloat y, GLfloat color[3]) {
+	point[0] = x; point[1] = y;
+
+
+	ModelViewProjectionMatrix = ViewProjectionMatrix * glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+
+	glBindVertexArray(VAO_point);
+
+	glUniform3fv(loc_primitive_color, 1, color);
+	glPointSize(3.0);
+	glDrawArrays(GL_POINTS, 0, 1);
+	glPointSize(1.0);
+	glBindVertexArray(0);
+
+	glBindVertexArray(0);
 }
 
 float max_win_size = win_width < win_height ? win_width : win_height;
 float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 int collisionDetected(float distX, float distY, float xRadius, float yRadius);
-void drawLine(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2);
-void drawPoint(GLfloat x1, GLfloat y1);
 
 // AIRPLANE FACTORS
 int theta = 0;
+int arcTanFactor = 0;
 
 // CAR FACTORS
 float car_scale_ratio = 1.0f;
@@ -863,28 +886,51 @@ void display(void) {
 	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
 	float ra;
-	float sinTheta, cosTheta;
-	float dx = 5 * cos(theta) * cos(5 * theta) - sin(theta) * sin(5 * theta);
-	float dy = 5 * sin(theta) * cos(5 * theta) + cos(theta) * sin(5 * theta);
-	ra = radius * sin(5 * theta * TO_RADIAN);
+	float dx = 5.0 * cos(theta * TO_RADIAN) * cos(5.0 * theta * TO_RADIAN) - sin(theta * TO_RADIAN) * sin(5.0 * theta * TO_RADIAN);
+	float dy = 5.0 * sin(theta * TO_RADIAN) * cos(5.0 * theta * TO_RADIAN) + cos(theta * TO_RADIAN) * sin(5.0 * theta * TO_RADIAN);
+	ra = radius * sin(5.0 * theta * TO_RADIAN);
 	air_x = ra * cos(theta * TO_RADIAN);
 	air_y = ra * sin(theta * TO_RADIAN);
 
-	drawLine(air_x, air_y, air_x+1, air_y+1);
 	float air_angle = theta;
 	float arcTan = atan(dy / dx) * TO_DEGREE;
 
-	if (dx * dy == 0) air_angle = (int)(air_angle + 90) % 360;
-	if (arcTan < 0) arcTan += 360;
-	air_angle += arcTan + 90;
-	//fprintf(stdout, "%f\n", 1.0f / 5.0f / radius / cos(5 * theta));
+	//if (dx * dy == 0) arcTan += 90;//air_angle = (int)(air_angle + 45) % 360;
 
+	arcTan = (int)arcTan % 180;
+	if (dx > 0) {
+		if (dy > 0) ;
+		else if (dy == 0) arcTan = 0;
+		else arcTan += 360;
+	}
+	else if (dx == 0) {
+		if (dy > 0) arcTan = 90;
+		else arcTan = 270;
+	}
+	else {
+		if (dy > 0) arcTan += 180;
+		else if (dy == 0) arcTan = 180;
+		else arcTan += 180;
+	}
+
+	air_angle = arcTan + 90;
+	fprintf(stdout, "%d %f\n", theta, air_angle);
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(air_x, air_y, 0.0f));
 	ModelMatrix = glm::rotate(ModelMatrix, air_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_airplane();
+
+	GLfloat color[3] = { 0 / 255.0f, 0 / 255.0f, 255 / 255.0f };
+	if (isLine) {
+		float starX, starY;
+		for (float i = 0; i < 180; i += 0.5) {
+			starX = radius * sin(5.0 * i * TO_RADIAN) * cos(i * TO_RADIAN);
+			starY = radius * sin(5.0 * i * TO_RADIAN) * sin(i * TO_RADIAN);
+			drawPoint(starX, starY, color);
+		}
+	}
 
 
 	// 2) CAR TRANSFORMATION - TRANSLATION & ROTATION
@@ -897,7 +943,6 @@ void display(void) {
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car();
-	drawLine(car1_x + car1_width, -300, car1_x + car1_width, 300);
 	//
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
@@ -906,8 +951,11 @@ void display(void) {
 	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car2();
-	drawLine(car2_x - car2_width, -300, car2_x - car2_width, 300);
 
+	if (isLine) {
+		drawLine(car1_x + car1_width, -300, car1_x + car1_width, 300);
+		drawLine(car2_x - car2_width, -300, car2_x - car2_width, 300);
+	}
 
 
 	// 3) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
@@ -1052,7 +1100,6 @@ glm::mat4 initTransform(glm::mat4 ModelMatrix) {
 
 int collisionDetected(float distX, float distY, float xRadius, float yRadius) {
 	float dist = sqrt(distX * distX + distY + distY);
-	//(stdout, "%f %f\n", dist, xRadius + yRadius);
 	if (dist <= xRadius + yRadius)
 		return 1;
 	return 0;
@@ -1140,18 +1187,14 @@ void timer_scene(int timestamp_scene) {
 			car_reflect_angle = rand() % 60;
 			car_reflect_angle = rand() % 2 ? 180 - car_reflect_angle : 180 + car_reflect_angle;
 			grad = tan(car_reflect_angle * TO_RADIAN);
-			fprintf(stdout, "%f %f %d %f\n", car1_x, car1_y, car_reflect_angle, grad);
-
 		}
 	}
 	else {
 		flyRotate = (flyRotate + 50) % 360;
-		int prevWall;
 		switch (flyOrder) {
 		case 0:
 			car1_x += 30.0f * cos(car_reflect_angle * TO_RADIAN);
 			car1_y = grad * (car1_x - tmpX) + tmpY;
-			fprintf(stdout, "%f %f %d %f\n", car1_x, car1_y, car_reflect_angle, grad);
 
 			if ((hitWall = outOfScreen(car1_x, car1_y)) ) {
 				flyOrder = (flyOrder + 1) % 3;
@@ -1165,15 +1208,11 @@ void timer_scene(int timestamp_scene) {
 				else if (hitWall == 4 && grad > 0) car_reflect_angle = 360 - car_reflect_angle;
 
 				grad = tan(car_reflect_angle * TO_RADIAN);
-
-				fprintf(stdout, "%f %f\n", car1_x, car1_y);
-				//fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
 			}
 			break;
 		case 1:
 			car1_x += 30.0f * cos(car_reflect_angle * TO_RADIAN);
 			
-			prevWall = hitWall;
 			car1_y = grad * (car1_x - tmpX) + tmpY;
 			if ( (hitWall = outOfScreen(car1_x, car1_y)) > 0 ) {
 				flyOrder = (flyOrder + 1) % 3;
@@ -1181,7 +1220,6 @@ void timer_scene(int timestamp_scene) {
 				tmpY = car1_y;
 
 				car_reflect_angle = rand() % 60;
-
 
 				switch (hitWall) {
 				case 1:
@@ -1202,8 +1240,6 @@ void timer_scene(int timestamp_scene) {
 					break;
 				}
 				grad = tan(car_reflect_angle * TO_RADIAN);
-
-				fprintf(stdout, "%f %f %d\n", grad, (30.0f * abs(cos(car_reflect_angle))), hitWall);
 			}
 			break;
 		case 2:
@@ -1218,7 +1254,6 @@ void timer_scene(int timestamp_scene) {
 				car_scale_ratio = 1.0f;
 				flyRotate = 0;
 				flyAway = 0;
-				fprintf(stdout, "\n\n");
 			}
 			break;
 		}
@@ -1468,6 +1503,7 @@ void prepare_scene(void) {
 	prepare_car2();
 	prepare_sword();
 
+	preparePoint();
 	prepare_face();
 	prepare_face_angry();
 }
