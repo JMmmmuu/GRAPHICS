@@ -914,7 +914,6 @@ void display(void) {
 	}
 
 	air_angle = arcTan + 90;
-	fprintf(stdout, "%d %f\n", theta, air_angle);
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(air_x, air_y, 0.0f));
 	ModelMatrix = glm::rotate(ModelMatrix, air_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -1142,8 +1141,6 @@ void reshape(int width, int height) {
 	car1_width *= 16.0f;
 	car2_width *= 18.0f;
 
-
-
 	glViewport(0, 0, win_width, win_height);
 	ProjectionMatrix = glm::ortho(-win_width / 2.0, win_width / 2.0,
 		-win_height / 2.0, win_height / 2.0, -1000.0, 1000.0);
@@ -1362,7 +1359,6 @@ void timer_scene(int timestamp_scene) {
 
 
 	// CUSTOMIZE OBJECT
-
 	if (ANGRY) {
 		angry_x += 8;
 		if (angry_x >= (float)win_width / 2 + (float)win_height / 2) {
@@ -1423,11 +1419,6 @@ void timer_scene(int timestamp_scene) {
 		}
 	}
 
-	
-
-
-
-
 	glutPostRedisplay();
 	glutTimerFunc(40, timer_scene, 1);
 }
@@ -1455,11 +1446,20 @@ void cleanup(void) {
 	glDeleteVertexArrays(1, &VAO_cocktail);
 	glDeleteBuffers(1, &VBO_cocktail);
 
+	glDeleteVertexArrays(1, &VAO_sword);
+	glDeleteBuffers(1, &VBO_sword);
+
 	glDeleteVertexArrays(1, &VAO_face);
 	glDeleteBuffers(1, &VBO_face);
 
 	glDeleteVertexArrays(1, &VAO_face_angry);
 	glDeleteBuffers(1, &VBO_face_angry);
+
+	glDeleteVertexArrays(1, &VAO_cu_line);
+	glDeleteBuffers(1, &VBO_cu_line);
+
+	glDeleteVertexArrays(1, &VAO_point);
+	glDeleteBuffers(1, &VBO_point);
 	
 }
 
@@ -1535,8 +1535,7 @@ void initialize_glew(void) {
 void greetings(char *program_name, char messages[][256], int n_message_lines) {
 	fprintf(stdout, "**************************************************************\n\n");
 	fprintf(stdout, "  PROGRAM NAME: %s\n\n", program_name);
-	fprintf(stdout, "    This program was coded for CSE4170 students\n");
-	fprintf(stdout, "      of Dept. of Comp. Sci. & Eng., Sogang University.\n\n");
+	fprintf(stdout, "    This program was coded by Yuseok Jung. 20171690\n");
 
 	for (int i = 0; i < n_message_lines; i++)
 		fprintf(stdout, "%s\n", messages[i]);
@@ -1549,7 +1548,7 @@ void greetings(char *program_name, char messages[][256], int n_message_lines) {
 void main(int argc, char *argv[]) {
 	char program_name[64] = "Sogang CSE4170 2DObjects_GLSL_3.0.1.3";
 	char messages[N_MESSAGE_LINES][256] = {
-		"    - Keys used: 'ESC' "
+		"    - Keys used: 'ESC' 'l/L' 'a/A' "
 	};
 
 	glutInit(&argc, argv);

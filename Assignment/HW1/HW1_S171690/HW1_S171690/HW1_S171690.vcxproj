@@ -151,7 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="3.0.1.3.2D_Objects_19.cpp" />
+    <ClCompile Include="s171690.cpp" />
     <ClCompile Include="Shaders\LoadShaders.cpp" />
   </ItemGroup>
   <ItemGroup>
