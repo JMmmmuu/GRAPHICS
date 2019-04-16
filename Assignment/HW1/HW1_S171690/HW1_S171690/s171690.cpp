@@ -821,6 +821,14 @@ float max_win_size = win_width < win_height ? win_width : win_height;
 float radius = win_width < win_height ? win_width / 2.5f : win_height / 2.5f;
 int collisionDetected(float distX, float distY, float xRadius, float yRadius);
 
+// HOUSE FACTORS
+float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
+int house_trans_order = 0;
+glm::mat4 shearingMat = glm::mat4x4(1.0f);
+
+// SWORD FACTORS
+float sword_timer_pos = radius;
+
 // AIRPLANE FACTORS
 int theta = 0;
 int arcTanFactor = 0;
@@ -837,14 +845,6 @@ int flyOrder = 0;
 int flyRotate = 0;
 float grad;
 
-// HOUSE FACTORS
-float house_scale_x = 1, house_scale_y = 1, house_ratio = 0;
-int house_trans_order = 0;
-glm::mat4 shearingMat = glm::mat4x4(1.0f);
-
-// SWORD FACTORS
-float sword_timer_pos = radius;
-
 // COCKTAIL FACTORS
 int cocktail_timer_rotation = 0;
 int cocktail_angle = 0;
@@ -854,7 +854,7 @@ int cock_trans_order = 0;
 int isLine = 0;
 glm::mat4 initTransform(glm::mat4 ModelMatrix);
 
-// CUSTOMIZE CODE
+// CUSTOMIZE FACTORS
 #define FACE_NUM 24
 float face_x[FACE_NUM] = { 0, }, face_y[FACE_NUM] = { 0, };
 float x_basis[FACE_NUM] = { 0, }, y_basis[FACE_NUM] = { 0, };
@@ -883,7 +883,44 @@ void display(void) {
 
 	// my Own Code
 
-	// 1) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
+	// 1) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
+	float angle;
+	float sword_size;
+	glm::vec3 sword_co;
+	for (angle = 0; angle < 360; angle += 30) {
+		sword_co = glm::vec3(sword_timer_pos * cos((float)angle * TO_RADIAN), sword_timer_pos * sin((float)angle * TO_RADIAN), 0.0f);
+		sword_size = sword_timer_pos / radius * 3.5f;
+		ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+
+		ModelMatrix = glm::translate(ModelMatrix, sword_co);
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(sword_size, sword_size, 1.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, (90 + angle)*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		draw_sword();
+	}
+
+	// 2) HOUSE TRANSFORMATION - SCALING & SHEARING
+	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
+	switch (house_trans_order) {
+	case 0: case 4: case 5: case 6: case 7:
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(house_scale_x, house_scale_y, 1.0f));
+		break;
+	case 1: case 2: case 3:
+		shearingMat[0][1] = 0;
+		shearingMat[1][0] = house_ratio;
+		ModelMatrix *= shearingMat;
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f, 3.0f, 1.0f));
+		break;
+	}
+	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_house();
+
+
+	// 3) AIRPLANE TRANSFORMATION - ROTATION & TRANSLATION
 	float air_x, air_y;
 	float ra;
 	float dx = 5.0 * cos(theta * TO_RADIAN) * cos(5.0 * theta * TO_RADIAN) - sin(theta * TO_RADIAN) * sin(5.0 * theta * TO_RADIAN);
@@ -894,8 +931,6 @@ void display(void) {
 
 	float air_angle = theta;
 	float arcTan = atan(dy / dx) * TO_DEGREE;
-
-	//if (dx * dy == 0) arcTan += 90;//air_angle = (int)(air_angle + 45) % 360;
 
 	arcTan = (int)arcTan % 180;
 	if (dx > 0) {
@@ -932,7 +967,7 @@ void display(void) {
 	}
 
 
-	// 2) CAR TRANSFORMATION - TRANSLATION & ROTATION
+	// 4) CAR TRANSFORMATION - TRANSLATION & ROTATION
 	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(car1_x, car1_y, 0.0f));
 
@@ -955,43 +990,6 @@ void display(void) {
 		drawLine(car1_x + car1_width, -300, car1_x + car1_width, 300);
 		drawLine(car2_x - car2_width, -300, car2_x - car2_width, 300);
 	}
-
-
-	// 3) SWORD TRANSFORMATION - ROTATION & SCALING & TRANSLATION
-	float angle;
-	float sword_size;
-	glm::vec3 sword_co;
-	for (angle = 0; angle < 360; angle += 30) {
-		sword_co = glm::vec3(sword_timer_pos * cos((float)angle * TO_RADIAN), sword_timer_pos * sin((float)angle * TO_RADIAN), 0.0f);
-		sword_size = sword_timer_pos / radius * 3.5f;
-		ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
-		ModelMatrix = glm::translate(ModelMatrix, sword_co);
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(sword_size, sword_size, 1.0f));
-		ModelMatrix = glm::rotate(ModelMatrix, (90 + angle)*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-
-		ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-		draw_sword();
-	}
-
-	// 4) HOUSE TRANSFORMATION - SCALING & SHEARING
-	ModelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(2.0f, 2.0f, 1.0f));
-	switch (house_trans_order) {
-	case 0: case 4: case 5: case 6: case 7:
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(house_scale_x, house_scale_y, 1.0f));
-		break;
-	case 1: case 2: case 3:
-		shearingMat[0][1] = 0;
-		shearingMat[1][0] = house_ratio;
-		ModelMatrix *= shearingMat;
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0f, 3.0f, 1.0f));
-		break;
-	}
-	ModelViewProjectionMatrix = ViewProjectionMatrix * ModelMatrix;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_house();
 
 	// 5) COCKTAIL TRANSFORMATION - REFLECTION(TRANSLATION & ROTATION)
 	if (isLine) {
@@ -1163,9 +1161,70 @@ int outOfScreen(float x, float y) {
 
 int car_reflect_angle = 0;
 void timer_scene(int timestamp_scene) {
+	// SWORD
+	sword_timer_pos -= 5.0f;
+	if (sword_timer_pos < 0)
+		sword_timer_pos = radius;
+
+
+	// HOUSE
+	switch (house_trans_order) {
+	case 0:
+		house_scale_y += 0.1f;
+		if (house_scale_y > 3.0f) {
+			house_scale_y = 3.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	case 1:
+		house_ratio += 0.1f;
+		if (house_ratio > 2) {
+			house_ratio = 2.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	case 2:
+		house_ratio -= 0.1f;
+		if (house_ratio < -2) {
+			house_ratio = -2.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	case 3:
+		house_ratio += 0.1f;
+		if (house_ratio > 0) {
+			house_ratio = 0.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	case 4:
+		house_scale_x += 0.1f;
+		if (house_scale_x > 3.0f) {
+			house_scale_x = 3.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	case 5:
+		house_scale_y -= 0.1f;
+		if (house_scale_y < 1.0f) {
+			house_scale_y = 1.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	case 6:
+		house_scale_x -= 0.1f;
+		if (house_scale_x < 1.0f) {
+			house_scale_x = 1.0f;
+			house_trans_order = (house_trans_order + 1) % 7;
+		}
+		break;
+	}
+
+
 	// AIRPLANE
 	theta = (theta + 1) % 360;
 	float tmpX = car1_x, tmpY = car1_y;
+
 
 	// CARS
 	if (!flyAway) {
@@ -1256,63 +1315,6 @@ void timer_scene(int timestamp_scene) {
 		}
 	}
 
-	// HOUSE
-	switch (house_trans_order) {
-		case 0:
-			house_scale_y += 0.1f;
-			if (house_scale_y > 3.0f) {
-				house_scale_y = 3.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-		case 1:
-			house_ratio += 0.1f;
-			if (house_ratio > 2) {
-				house_ratio = 2.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-		case 2:
-			house_ratio -= 0.1f;
-			if (house_ratio < -2) {
-				house_ratio = -2.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-		case 3:
-			house_ratio += 0.1f;
-			if (house_ratio > 0) {
-				house_ratio = 0.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-		case 4:
-			house_scale_x += 0.1f;
-			if (house_scale_x > 3.0f) {
-				house_scale_x = 3.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-		case 5:
-			house_scale_y -= 0.1f;
-			if (house_scale_y < 1.0f) {
-				house_scale_y = 1.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-		case 6:
-			house_scale_x -= 0.1f;
-			if (house_scale_x < 1.0f) {
-				house_scale_x = 1.0f;
-				house_trans_order = (house_trans_order + 1) % 7;
-			}
-			break;
-	}
-
-	// SWORD
-	sword_timer_pos -= 5.0f;
-	if (sword_timer_pos < 0)
-		sword_timer_pos = radius;
 
 	// COCKTAIL
 	cocktail_timer_rotation = (cocktail_timer_rotation + 30) % 360;
