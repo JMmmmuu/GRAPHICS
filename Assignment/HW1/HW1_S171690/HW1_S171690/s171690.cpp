@@ -1117,8 +1117,9 @@ void keyboard(unsigned char key, int x, int y) {
 			for (int i = 0; i < FACE_NUM; i++) {
 				face_x[i] = 0; face_y[i] = 0;
 				x_basis[i] = 0; y_basis[i] = 0;
-				face_angle = 0;
+				face_rotate[i] = 0;
 			}
+			face_angle = 0;
 			FACE_BUTTON = 1;
 		}
 		break;
