@@ -15,20 +15,32 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LoadShaders.h">
+    <ClInclude Include="geomety.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="intialize.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\LoadShaders.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="simple.frag">
+    <None Include="Shaders\simple.frag">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="simple.vert">
+    <None Include="Shaders\simple.vert">
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LoadShaders.cpp">
+    <ClCompile Include="HW3_s171690.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders\LoadShaders.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

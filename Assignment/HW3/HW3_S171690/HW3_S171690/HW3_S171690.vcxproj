@@ -149,14 +149,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="LoadShaders.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="geomety.h" />
+    <ClInclude Include="intialize.h" />
+    <ClInclude Include="Shaders\LoadShaders.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="simple.frag" />
-    <None Include="simple.vert" />
+    <None Include="Shaders\simple.frag" />
+    <None Include="Shaders\simple.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LoadShaders.cpp" />
+    <ClCompile Include="HW3_s171690.cpp" />
+    <ClCompile Include="Shaders\LoadShaders.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
