@@ -17,6 +17,7 @@ GLint loc_ModelViewProjectionMatrix, loc_primitive_color; // indices of uniform 
 #include <glm/gtc/matrix_transform.hpp> //translate, rotate, scale, lookAt, perspective, etc.
 #include <glm/gtc/matrix_inverse.hpp> //inverse, affineInverse, etc.
 
+int flag_polygon_fill = 0;
 
 #include "camera.h"
 
@@ -41,12 +42,11 @@ void display_camera(int camera_index) {
 	glLineWidth(1.0f);
 
 
-//	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-1.5f, 0.0f, -2.0f));
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 0));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(300, 300, 300));
-	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-1.5f, 0.0f, 2.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(150, 150, 150));
+	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-2.0f, -1.5f, 0.0f));
 
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90 * TO_RADIAN, glm::vec3(1, 0, 0));
+	//ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90 * TO_RADIAN, glm::vec3(1, 0, 0));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	draw_plane();
@@ -56,8 +56,7 @@ void display_camera(int camera_index) {
 
 
 
-//	ModelViewProjectionMatrix = glm::scale(ViewProjectionMatrix[camera_index], glm::vec3(2.0f, 2.0f, 2.0f));
-	//glUniform
+
 }
 
 void display(void) {
@@ -89,6 +88,15 @@ void keyboard(unsigned char key, int x, int y) {
 			glUseProgram(0);
 			glutPostRedisplay();
 			break;*/
+	case 'p':
+		fprintf(stdout, "%d\n", flag_polygon_fill);
+		flag_polygon_fill = 1 - flag_polygon_fill;
+		if (flag_polygon_fill)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glutPostRedisplay();
+		break;
 	case 27: // ESC key
 		glutLeaveMainLoop();
 		break;
@@ -102,6 +110,7 @@ void reshape(int width, int height) {
 	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio,
 		camera[0].near_clip, camera[0].far_clip);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+	ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 
 	camera[1].aspect_ratio = camera[0].aspect_ratio; // for the time being ...
 	viewport[1].x = (int)(0.75f*width); viewport[1].y = (int)(0.75f*height);
