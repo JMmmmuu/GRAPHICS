@@ -57,6 +57,7 @@ void initialize_OpenGL(void) {
 
 void prepare_scene() {
 	prepare_plane();
+	prepare_partial();
 	prepare_axes();
 	prepare_points();
 	/*

@@ -47,6 +47,80 @@ void draw_plane(void) {
 	glBindVertexArray(0);
 }
 
+GLuint partial_VBO, partial_VAO;
+GLfloat partial_vertices[364][8];
+
+void prepare_partial() {
+	// initialize vertices
+	GLfloat x = 4.0f * 215 / 600 / 2 * 1.3, y = 3.0f * 350 / 450 / 2 * 1.3;
+	GLfloat r = 4.0f / 2 * 5 / 16;
+	int i, j;
+	/*partial_vertices[0][0] = 0; partial_vertices[0][1] = 0; partial_vertices[0][2] = 0;
+	partial_vertices[0][3] = 0; partial_vertices[0][4] = 0; partial_vertices[0][5] = 1;
+	partial_vertices[0][6] = 0; partial_vertices[0][7] = 0;*/
+
+	i = 0;
+	for (j = 0; j <= 90; j++, i++) {
+		partial_vertices[i][0] = x - r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = y - r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
+		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
+	}
+	for (j = 90; j <= 180; j++, i++) {
+		partial_vertices[i][0] = -x + r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = y - r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
+		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
+	}
+	for (j = 180; j <= 270; j++, i++) {
+		partial_vertices[i][0] = -x + r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = -y + r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
+		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
+	}
+	for (j = 270; j <= 360; j++, i++) {
+		partial_vertices[i][0] = x - r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = -y + r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
+		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
+	}
+	fprintf(stdout, "%d\n", i);
+
+
+	// Initialize vertex buffer object.
+
+	glGenBuffers(1, &partial_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, partial_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(partial_vertices), &partial_vertices[0][0], GL_STATIC_DRAW);
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &partial_VAO);
+	glBindVertexArray(partial_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, partial_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+}
+
+void draw_partial(GLfloat r, GLfloat g, GLfloat b) {
+	glFrontFace(GL_CCW);
+	GLfloat partial_color[3];
+	partial_color[0] = r / 255;
+	partial_color[1] = g / 255;
+	partial_color[2] = b / 255;
+
+
+	glBindVertexArray(partial_VAO);
+	glUniform3fv(loc_primitive_color, 1, partial_color);
+	glDrawArrays(GL_LINE_LOOP, 0, 364);
+	glBindVertexArray(0);
+}
+
 GLuint axes_VBO, axes_VAO;
 GLfloat axes_vertices[6][3] = {
 	{ 0.0f, 0.0f, 0.0f },{ 1.0f, 0.0f, 0.0f },{ 0.0f, 0.0f, 0.0f },{ 0.0f, 1.0f, 0.0f },

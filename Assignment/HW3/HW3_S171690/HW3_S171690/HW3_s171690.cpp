@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
@@ -31,8 +32,6 @@ void display_camera(int camera_index) {
 
 	glViewport(viewport[camera_index].x, viewport[camera_index].y, viewport[camera_index].w, viewport[camera_index].h);
 
-	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 90 * TO_RADIAN, glm::vec3(1, 0, 0));
-	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], -90 * TO_RADIAN, glm::vec3(1, 0, 0));
 	// At this point, the matrix ViewProjectionMatrix has been properly set up.
 
 	ModelViewProjectionMatrix = glm::scale(ViewProjectionMatrix[camera_index], glm::vec3(5.0f, 5.0f, 5.0f));
@@ -46,15 +45,24 @@ void display_camera(int camera_index) {
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(150, 150, 150));
 	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-2.0f, -1.5f, 0.0f));
 
-	//ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90 * TO_RADIAN, glm::vec3(1, 0, 0));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	draw_plane();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100, 100, 100));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	draw_partial(51, 204, 51);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-
-
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100, 100, 100));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	draw_partial(153, 255, 255);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
 }
