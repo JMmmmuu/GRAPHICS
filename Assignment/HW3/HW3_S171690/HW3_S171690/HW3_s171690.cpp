@@ -442,31 +442,31 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void special(int key, int x, int y) {
-	glm::vec3 n, u;
+	if (view_mode == DRIVER_PERS) return;
+	glm::vec3 n, u, v;
 	glm::mat4 tmp;
+
+	n = camera[0].prp - camera[0].vrp;
+	u = cross(camera[0].vup, n);
+	v = cross(n, u);
 
 	switch (key) {
 	case GLUT_KEY_UP:
-		n = camera[0].prp - camera[0].vrp;
-		u = cross(camera[0].vup, n);
 		tmp = glm::rotate(glm::mat4(1.0f), -CAM_ROT_SENSITIVITY * TO_RADIAN, u);
-
-		camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
-		camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
 		break;
 	case GLUT_KEY_DOWN:
-		n = camera[0].prp - camera[0].vrp;
-		u = cross(camera[0].vup, n);
 		tmp = glm::rotate(glm::mat4(1.0f), CAM_ROT_SENSITIVITY * TO_RADIAN, u);
-
-		camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
-		camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
 		break;
 	case GLUT_KEY_LEFT:
+		tmp = glm::rotate(glm::mat4(1.0f), -CAM_ROT_SENSITIVITY * TO_RADIAN, v);
 		break;
 	case GLUT_KEY_RIGHT:
+		tmp = glm::rotate(glm::mat4(1.0f), CAM_ROT_SENSITIVITY * TO_RADIAN, v);
 		break;
 	}
+
+	camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
+	camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
 
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
