@@ -22,7 +22,7 @@ void initialize_flags() {
 #define PRINT_DEBUG_INFO  
 void initialize_OpenGL() {
 	// initialize the 0th camera.
-	camera[0].prp = glm::vec3(400.0f, 400.0f, 400.0f);
+	camera[0].prp = glm::vec3(500.0f, 400.0f, 400.0f);
 	camera[0].vrp = glm::vec3(0.0f, 0.0f, 0.0f);
 	camera[0].vup = glm::vec3(0.0f, 1.0f, 0.0f);
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
@@ -31,7 +31,7 @@ void initialize_OpenGL() {
 	camera[0].fov_y = 45.0f;
 	camera[0].aspect_ratio = 1.0f; // will be set when the viewing window popped up.
 	camera[0].near_clip = 0.1f;
-	camera[0].far_clip = 1000.0f;
+	camera[0].far_clip = 1200.0f;
 	camera[0].zoom_factor = 1.0f; // will be used for zoomming in and out.
 
 			
@@ -69,12 +69,12 @@ void prepare_scene() {
 	prepare_partial();
 	prepare_axes();
 	prepare_points();
-	/*
+	
 	prepare_ben();
 	prepare_cow();
 	prepare_plane();
 	prepare_tiger();
-	prepare_spider();*/
+	prepare_spider();
 	
 	prepare_geom_obj(GEOM_OBJ_ID_CAR_BODY, "Data/Car/car_body_triangles_v.txt", GEOM_OBJ_TYPE_V);
 	prepare_geom_obj(GEOM_OBJ_ID_CAR_WHEEL, "Data/Car/car_wheel_triangles_v.txt", GEOM_OBJ_TYPE_V);

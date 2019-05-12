@@ -34,6 +34,12 @@ glm::mat4 ModelMatrix_CAR_BODY_to_DRIVER; // computed only once in initialize_ca
 VIEW_MODE view_mode;
 
 #include "geomety.h"
+float car_pos_x, car_pos_y, car_rotation_angle;
+int car_left_flag = 1;
+int tiger_rotation_angle = 0;
+
+float tiger_pos_x, tiger_pos_y;
+float ben_pos_x, ben_pos_y, ben_rotation_angle;
 
 void display_camera(int camera_index) {
 
@@ -92,7 +98,9 @@ void display_camera(int camera_index) {
 	// draw CAR
 	//ModelMatrix_CAR_BODY = glm::rotate(glm::mat4(1.0f), -rotation_angle_car, glm::vec3(0.0f, 1.0f, 0.0f));
 	ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 3.0f, 3.0f));
-	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(20.0f, 4.89f, 5.0f));
+	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 5.0f));
+	
+	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, (car_rotation_angle + 90.0f) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
@@ -100,10 +108,56 @@ void display_camera(int camera_index) {
 	draw_car_dummy();
 
 
+	//ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(142.5f, 113.0f, 3.0f));
+	if (car_left_flag)
+		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f + 142.5f, car_pos_y * 113.0f, 15.0f));
+	else
+		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f - 142.5f, car_pos_y * 113.0f, 15.0f));
+	ModelMatrix_CAR_BODY = glm::scale(ModelMatrix_CAR_BODY, glm::vec3(3.0f, 3.0f, 3.0f));
+	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, (car_rotation_angle + 90.0f) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_car_dummy();
+	
+	// draw tiger
+	ModelViewProjectionMatrix = glm::rotate(ViewProjectionMatrix[camera_index], 90 * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-100.0f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(0.35f, 0.35f, 0.35f));
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_tiger();
+
+
+	// draw spider
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(100.0f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100.0f, 100.0f, 100.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_spider();
+
+
+	// draw ben
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(ben_pos_x * 110.0f - 142.5f, ben_pos_y * 95.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(70.0f, 70.0f, 70.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, ben_rotation_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_ben();
+
+
 
 }
 
-void display(void) {
+void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	display_camera(0);
@@ -116,12 +170,195 @@ void display(void) {
 
 void timer_scene(int value) {
 
+	// CAR
+	static int car_idx = 1;
+	static int tmp = 1;
+	float car_speed = 0.01f;
+	float del_pos;
+
+	if (car_left_flag) {
+		if (car_idx == 91) {
+			car_pos_x -= car_speed;
+			del_pos = car_speed * 142.5f;
+			if (car_pos_x <= partial_vertices[car_idx + 1][0]) {
+				car_idx++;
+				tmp = 2;
+			}
+		}
+		else if (car_idx == 182) {
+			car_pos_y -= car_speed;
+			del_pos = car_speed * 113.0f;
+			if (car_pos_y <= partial_vertices[car_idx + 1][1]) {
+				car_idx = 364;
+				tmp = 4;
+				car_left_flag = 0;
+			}
+		}
+		else if (car_idx == 273) {
+			car_pos_x += car_speed;
+			del_pos = car_speed * 142.5f;
+			if (car_pos_x >= partial_vertices[car_idx + 1][0]) {
+				car_idx++;
+				tmp = 4;
+			}
+		}
+		else if (car_idx == 364) {
+			car_pos_y += car_speed;
+			del_pos = car_speed * 113.0f;
+			if (car_pos_y >= partial_vertices[1][1]) {
+				car_idx = 1;
+				tmp = 1;
+			}
+		}
+		else {
+			car_pos_x = partial_vertices[car_idx][0];
+			car_pos_y = partial_vertices[car_idx][1];
+			car_rotation_angle = (car_idx - tmp + 180) % 360;
+			car_idx++;
+			del_pos = 1;
+		}
+	}
+	else {
+		if (car_idx == 274) {
+			car_pos_x -= car_speed;
+			del_pos = car_speed * 142.5f;
+			if (car_pos_x <= partial_vertices[car_idx - 1][0]) {
+				car_idx--;
+				tmp = 3;
+			}
+		}
+		else if (car_idx == 183) {
+			car_pos_y += car_speed;
+			del_pos = car_speed * 113.0f;
+			if (car_pos_y >= partial_vertices[car_idx - 1][1]) {
+				car_idx--;
+				tmp = 2;
+			}
+		}
+		else if (car_idx == 92) {
+			car_pos_x += car_speed;
+			del_pos = car_speed * 142.5f;
+			if (car_pos_x >= partial_vertices[car_idx - 1][0]) {
+				car_idx--;
+				tmp = 1;
+			}
+		}
+		else if (car_idx == 1) {
+			car_pos_y -= car_speed;
+			del_pos = car_speed * 113.0f;
+			if (car_pos_y <= partial_vertices[364][1]) {
+				car_idx = 183;
+				tmp = 3;
+				car_left_flag = 1;
+			}
+		}
+		else {
+			car_pos_x = partial_vertices[car_idx][0];
+			car_pos_y = partial_vertices[car_idx][1];
+			car_rotation_angle = (car_idx - tmp) % 360;
+			car_idx--;
+			del_pos = 1;
+		}
+	}
+	//printf("\t\t%d %f %f %f\n", car_idx, car_pos_x, car_pos_y, car_rotation_angle);
+
+	float ra = 3.0f;
+	rotation_angle_wheel += 5;// (del_pos / ra) * 2;
+	if (rotation_angle_wheel >= 360) rotation_angle_wheel -= 360;
+	//printf("%f\t%f\n", del_pos, rotation_angle_wheel);
+
+	cur_frame_tiger = (value / 3) % N_TIGER_FRAMES;
+	cur_frame_ben = value % N_BEN_FRAMES;
+	cur_frame_spider = (value / 3) % N_SPIDER_FRAMES;
+
+
+	static int ben_idx = 1, ben_tmp = 1;
+	float ben_speed = 0.03f;
+	if (ben_idx == 91) {
+		ben_pos_x -= ben_speed;
+		if (ben_pos_x <= partial_vertices[ben_idx + 1][0]) {
+			ben_idx++;
+			ben_tmp = 2;
+		}
+	}
+	else if (ben_idx == 182) {
+		ben_pos_y -= ben_speed;
+		if (ben_pos_y <= partial_vertices[ben_idx + 1][1]) {
+			ben_idx++;
+			ben_tmp = 3;
+		}
+	}
+	else if (ben_idx == 273) {
+		ben_pos_x += ben_speed;
+		if (ben_pos_x >= partial_vertices[ben_idx + 1][0]) {
+			ben_idx++;
+			ben_tmp = 4;
+		}
+	}
+	else if (ben_idx == 364) {
+		ben_pos_y += ben_speed;
+		if (ben_pos_y >= partial_vertices[1][1]) {
+			ben_idx = 1;
+			ben_tmp = 1;
+		}
+	}
+	else {
+		ben_pos_x = partial_vertices[ben_idx][0];
+		ben_pos_y = partial_vertices[ben_idx][1];
+		ben_rotation_angle = (ben_idx - ben_tmp + 180) % 360;
+		ben_idx += 3;
+	}
+	printf("%d\n", ben_idx);
+
+
 	glutPostRedisplay();
-	//glutTimerFunc(100, timer_scene, (timestamp_scene + 1) % INT_MAX);
+	glutTimerFunc(10, timer_scene, (value + 1) % INT_MAX);
 }
 
-void motion(int x, int y) {
+unsigned int leftbutton_pressed = 0;
+int prevx, prevy;
+void mousePressed(int button, int state, int x, int y) {
+	if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)) {
+		prevx = x, prevy = y;
+		leftbutton_pressed = 1;
+		glutPostRedisplay();
+	}
+	else if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_UP)) {
+		leftbutton_pressed = 0;
+		glutPostRedisplay();
+	}
+}
 
+#define CAM_ROT_SENSITIVITY 0.15f
+void motion(int x, int y) {
+	glm::mat4 mat4_tmp;
+	glm::vec3 vec3_tmp;
+	float delx, dely;
+
+	if (leftbutton_pressed) {
+		delx = (float)(x - prevx), dely = -(float)(y - prevy);
+		prevx = x, prevy = y;
+
+		mat4_tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+		mat4_tmp = glm::rotate(mat4_tmp, CAM_ROT_SENSITIVITY*delx*TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
+		mat4_tmp = glm::translate(mat4_tmp, -camera[0].vrp);
+
+		camera[0].prp = glm::vec3(mat4_tmp*glm::vec4(camera[0].prp, 1.0f));
+		camera[0].vup = glm::vec3(mat4_tmp*glm::vec4(camera[0].vup, 0.0f));
+
+		vec3_tmp = glm::cross(camera[0].vup, camera[0].vrp - camera[0].prp);
+		mat4_tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+		mat4_tmp = glm::rotate(mat4_tmp, CAM_ROT_SENSITIVITY*dely*TO_RADIAN, vec3_tmp);
+		mat4_tmp = glm::translate(mat4_tmp, -camera[0].vrp);
+
+		camera[0].prp = glm::vec3(mat4_tmp*glm::vec4(camera[0].prp, 1.0f));
+		camera[0].vup = glm::vec3(mat4_tmp*glm::vec4(camera[0].vup, 0.0f));
+
+		ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+
+		ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+		glutPostRedisplay();
+	}
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -184,8 +421,8 @@ void register_callbacks(void) {
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	//glutSpecialFunc(special);
-	//glutMouseFunc(mousepress);
-	//glutMotionFunc(motion_1);
+	glutMouseFunc(mousePressed);
+	glutMotionFunc(motion);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(100, timer_scene, 0);
 	glutCloseFunc(cleanup);
