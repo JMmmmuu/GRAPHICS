@@ -18,13 +18,13 @@
     <ClInclude Include="geomety.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="intialize.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Shaders\LoadShaders.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="initialize.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

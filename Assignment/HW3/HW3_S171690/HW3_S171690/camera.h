@@ -10,8 +10,3 @@ typedef struct {
 typedef enum {
 	VIEW_WORLD, VIEW_TIGER, VIEW_CAR
 } VIEW_MODE;
-
-#define NUMBER_OF_CAMERAS 2
-
-CAMERA camera[NUMBER_OF_CAMERAS];
-VIEWPORT viewport[NUMBER_OF_CAMERAS];

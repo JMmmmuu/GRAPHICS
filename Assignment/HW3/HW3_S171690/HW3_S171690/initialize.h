@@ -20,7 +20,7 @@ void initialize_flags() {
 
 
 #define PRINT_DEBUG_INFO  
-void initialize_OpenGL(void) {
+void initialize_OpenGL() {
 	// initialize the 0th camera.
 	camera[0].prp = glm::vec3(400.0f, 400.0f, 400.0f);
 	camera[0].vrp = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -49,6 +49,15 @@ void initialize_OpenGL(void) {
 	camera[1].zoom_factor = 1.0f; // will be used for zoomming in and out.
 
 	view_mode = VIEW_WORLD;
+	/*
+	ModelMatrix_CAR_BODY = glm::mat4(1.0f);
+	ModelMatrix_CAR_WHEEL = glm::mat4(1.0f);
+	ModelMatrix_CAR_NUT = glm::mat4(1.0f);
+
+	// the transformation that moves the driver's camera frame from car body's MC to driver seat
+	ModelMatrix_CAR_BODY_to_DRIVER = glm::translate(glm::mat4(1.0f), glm::vec3(-3.0f, 0.5f, 2.5f));
+	ModelMatrix_CAR_BODY_to_DRIVER = glm::rotate(ModelMatrix_CAR_BODY_to_DRIVER,
+		TO_RADIAN*90.0f, glm::vec3(0.0f, 1.0f, 0.0f));*/
 
 	glClearColor(0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -66,6 +75,10 @@ void prepare_scene() {
 	prepare_plane();
 	prepare_tiger();
 	prepare_spider();*/
+	
+	prepare_geom_obj(GEOM_OBJ_ID_CAR_BODY, "Data/Car/car_body_triangles_v.txt", GEOM_OBJ_TYPE_V);
+	prepare_geom_obj(GEOM_OBJ_ID_CAR_WHEEL, "Data/Car/car_wheel_triangles_v.txt", GEOM_OBJ_TYPE_V);
+	prepare_geom_obj(GEOM_OBJ_ID_CAR_NUT, "Data/Car/car_nut_triangles_v.txt", GEOM_OBJ_TYPE_V);
 }
 
 void initialize_renderer() {

@@ -151,7 +151,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="geomety.h" />
-    <ClInclude Include="intialize.h" />
+    <ClInclude Include="initialize.h" />
     <ClInclude Include="Shaders\LoadShaders.h" />
   </ItemGroup>
   <ItemGroup>

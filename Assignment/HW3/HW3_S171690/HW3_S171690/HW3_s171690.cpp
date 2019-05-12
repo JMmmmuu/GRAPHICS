@@ -13,20 +13,27 @@
 GLuint h_ShaderProgram; // handle to shader program
 GLint loc_ModelViewProjectionMatrix, loc_primitive_color; // indices of uniform variables
 
-#include "geomety.h"
 
 #include <glm/gtc/matrix_transform.hpp> //translate, rotate, scale, lookAt, perspective, etc.
 #include <glm/gtc/matrix_inverse.hpp> //inverse, affineInverse, etc.
 
+#include "camera.h"
 int flag_polygon_fill = 0;
 
-#include "camera.h"
+#define NUMBER_OF_CAMERAS 2
+
+CAMERA camera[NUMBER_OF_CAMERAS];
+VIEWPORT viewport[NUMBER_OF_CAMERAS];
 
 glm::mat4 ViewProjectionMatrix[NUMBER_OF_CAMERAS], ViewMatrix[NUMBER_OF_CAMERAS], ProjectionMatrix[NUMBER_OF_CAMERAS];
 glm::mat4 ModelViewProjectionMatrix; // This one is sent to vertex shader when it is ready.
 
+glm::mat4 ModelMatrix_CAR_BODY, ModelMatrix_CAR_WHEEL, ModelMatrix_CAR_NUT, ModelMatrix_CAR_DRIVER;
+glm::mat4 ModelMatrix_CAR_BODY_to_DRIVER; // computed only once in initialize_camera()
 
 VIEW_MODE view_mode;
+
+#include "geomety.h"
 
 void display_camera(int camera_index) {
 
@@ -40,7 +47,7 @@ void display_camera(int camera_index) {
 	draw_axes(); // draw the WC axes.
 	glLineWidth(1.0f);
 
-
+	// draw floor
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 0));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(150, 150, 150));
 	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-2.0f, -1.5f, 0.0f));
@@ -50,20 +57,36 @@ void display_camera(int camera_index) {
 	draw_plane();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	// draw green
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(90, 90, 90));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	draw_partial(51, 204, 51);	// green
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100, 100, 100));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	draw_partial(51, 204, 51);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	draw_partial_line(255, 255, 0);
 
+	// draw water
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5f, 0.0f, 0.0f));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100, 100, 100));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	draw_partial(153, 255, 255);
+	draw_partial(153, 255, 255);	// blue
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
+	// draw CAR
+	ModelMatrix_CAR_BODY = glm::rotate(glm::mat4(1.0f), -rotation_angle_car, glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(20.0f, 4.89f, 0.0f));
+	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_car_dummy();
 
 }
 
@@ -73,6 +96,7 @@ void display(void) {
 	display_camera(0);
 	//display_camera(1);
 	glutSwapBuffers();
+
 
 
 }
@@ -136,6 +160,11 @@ void cleanup(void) {
 	glDeleteVertexArrays(1, &plane_VAO);
 	glDeleteBuffers(1, &plane_VBO);
 
+	
+	free_geom_obj(GEOM_OBJ_ID_CAR_BODY);
+	free_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
+	free_geom_obj(GEOM_OBJ_ID_CAR_NUT);
+
 }
 
 void register_callbacks(void) {
@@ -149,8 +178,7 @@ void register_callbacks(void) {
 	glutCloseFunc(cleanup);
 }
 
-
-#include "intialize.h"
+#include "initialize.h"
 
 #define N_MESSAGE_LINES 1
 int main(int argc, char* argv[]) {

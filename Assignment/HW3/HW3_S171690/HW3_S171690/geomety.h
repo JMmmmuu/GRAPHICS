@@ -21,7 +21,7 @@ void prepare_plane() {
 	glBindBuffer(GL_ARRAY_BUFFER, plane_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), &plane_vertices[0][0], GL_STATIC_DRAW);
 
-	// Initialize vertex array object.
+	// Initialize vertex array object
 	glGenVertexArrays(1, &plane_VAO);
 	glBindVertexArray(plane_VAO);
 
@@ -48,40 +48,43 @@ void draw_plane(void) {
 }
 
 GLuint partial_VBO, partial_VAO;
-GLfloat partial_vertices[364][8];
+GLfloat partial_vertices[366][8];
 
 void prepare_partial() {
 	// initialize vertices
-	GLfloat x = 4.0f * 215 / 600 / 2 * 1.3, y = 3.0f * 350 / 450 / 2 * 1.3;
-	GLfloat r = 4.0f / 2 * 5 / 16;
-	int i, j;
-	/*partial_vertices[0][0] = 0; partial_vertices[0][1] = 0; partial_vertices[0][2] = 0;
-	partial_vertices[0][3] = 0; partial_vertices[0][4] = 0; partial_vertices[0][5] = 1;
-	partial_vertices[0][6] = 0; partial_vertices[0][7] = 0;*/
+	GLfloat x = 1.0f, y = (11 + 20 * x) / 17.0f;
+	GLfloat ra = y / 2.0f * 3 / 8;
 
-	i = 0;
+	int i, j;
+	partial_vertices[0][0] = 0; partial_vertices[0][1] = 0; partial_vertices[0][2] = 0;
+	partial_vertices[0][3] = 0; partial_vertices[0][4] = 0; partial_vertices[0][5] = 1;
+	partial_vertices[0][6] = 0; partial_vertices[0][7] = 0;
+
+	i = 1;
 	for (j = 0; j <= 90; j++, i++) {
-		partial_vertices[i][0] = x - r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = y - r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][0] = x - ra + ra * cos(j * TO_RADIAN); partial_vertices[i][1] = y - ra + ra * sin(j * TO_RADIAN);
 		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
 		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
 	}
 	for (j = 90; j <= 180; j++, i++) {
-		partial_vertices[i][0] = -x + r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = y - r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][0] = -x + ra + ra * cos(j * TO_RADIAN); partial_vertices[i][1] = y - ra + ra * sin(j * TO_RADIAN);
 		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
 		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
 	}
 	for (j = 180; j <= 270; j++, i++) {
-		partial_vertices[i][0] = -x + r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = -y + r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][0] = -x + ra + ra * cos(j * TO_RADIAN); partial_vertices[i][1] = -y + ra + ra * sin(j * TO_RADIAN);
 		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
 		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
 	}
 	for (j = 270; j <= 360; j++, i++) {
-		partial_vertices[i][0] = x - r + r * cos(j * TO_RADIAN); partial_vertices[i][1] = -y + r + r * sin(j * TO_RADIAN);
+		partial_vertices[i][0] = x - ra + ra * cos(j * TO_RADIAN); partial_vertices[i][1] = -y + ra + ra * sin(j * TO_RADIAN);
 		partial_vertices[i][2] = 0.0f; partial_vertices[i][3] = 0.0f; partial_vertices[i][4] = 0.0f; partial_vertices[i][5] = 1.0f;
 		partial_vertices[i][6] = partial_vertices[i][7] = 0.0f;
 	}
-	fprintf(stdout, "%d\n", i);
-
+	partial_vertices[i][0] = x; partial_vertices[i][1] = y-ra; partial_vertices[i][2] = 0;
+	partial_vertices[i][3] = 0; partial_vertices[i][4] = 0; partial_vertices[i][5] = 1;
+	partial_vertices[i][6] = 0; partial_vertices[i][7] = 0;
+	fprintf(stdout, "%d %f %f %f\n", i, x, y, ra);
 
 	// Initialize vertex buffer object.
 
@@ -114,10 +117,21 @@ void draw_partial(GLfloat r, GLfloat g, GLfloat b) {
 	partial_color[1] = g / 255;
 	partial_color[2] = b / 255;
 
+	glBindVertexArray(partial_VAO);
+	glUniform3fv(loc_primitive_color, 1, partial_color);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 366);
+	glBindVertexArray(0);
+}
+void draw_partial_line(GLfloat r, GLfloat g, GLfloat b) {
+	glFrontFace(GL_CCW);
+	GLfloat partial_color[3];
+	partial_color[0] = r / 255;
+	partial_color[1] = g / 255;
+	partial_color[2] = b / 255;
 
 	glBindVertexArray(partial_VAO);
 	glUniform3fv(loc_primitive_color, 1, partial_color);
-	glDrawArrays(GL_LINE_LOOP, 0, 364);
+	glDrawArrays(GL_LINE_LOOP, 1, 365);
 	glBindVertexArray(0);
 }
 
@@ -457,4 +471,158 @@ void draw_ben(void) {
 	glBindVertexArray(ben_VAO);
 	glDrawArrays(GL_TRIANGLES, ben_vertex_offset[cur_frame_ben], 3 * ben_n_triangles[cur_frame_ben]);
 	glBindVertexArray(0);
+}
+
+
+/***************************
+*
+*  PREPARE & DRAW CAR
+*
+****************************/
+
+
+#define N_GEOMETRY_OBJECTS 3
+#define GEOM_OBJ_ID_CAR_BODY 0
+#define GEOM_OBJ_ID_CAR_WHEEL 1
+#define GEOM_OBJ_ID_CAR_NUT 2
+
+GLuint geom_obj_VBO[N_GEOMETRY_OBJECTS];
+GLuint geom_obj_VAO[N_GEOMETRY_OBJECTS];
+
+int geom_obj_n_triangles[N_GEOMETRY_OBJECTS];
+GLfloat *geom_obj_vertices[N_GEOMETRY_OBJECTS];
+
+typedef enum _GEOM_OBJ_TYPE { GEOM_OBJ_TYPE_V = 0, GEOM_OBJ_TYPE_VN, GEOM_OBJ_TYPE_VNT } GEOM_OBJ_TYPE;
+int GEOM_OBJ_ELEMENTS_PER_VERTEX[3] = { 3, 6, 8 };
+
+
+int read_geometry_file(GLfloat **object, char *filename, GEOM_OBJ_TYPE geom_obj_type) {
+	int i, n_triangles;
+	float *flt_ptr;
+	FILE *fp;
+
+	fprintf(stdout, "Reading geometry from the geometry file %s...\n", filename);
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		fprintf(stderr, "Cannot open the geometry file %s ...", filename);
+		return -1;
+	}
+
+	fscanf(fp, "%d", &n_triangles);
+	*object = (float *)malloc(3 * n_triangles*GEOM_OBJ_ELEMENTS_PER_VERTEX[geom_obj_type] * sizeof(float));
+	if (*object == NULL) {
+		fprintf(stderr, "Cannot allocate memory for the geometry file %s ...", filename);
+		return -1;
+	}
+
+	flt_ptr = *object;
+	for (i = 0; i < 3 * n_triangles * GEOM_OBJ_ELEMENTS_PER_VERTEX[geom_obj_type]; i++)
+		fscanf(fp, "%f", flt_ptr++);
+	fclose(fp);
+
+	fprintf(stdout, "Read %d primitives successfully.\n\n", n_triangles);
+
+	return n_triangles;
+}
+
+void prepare_geom_obj(int geom_obj_ID, const char *filename, GEOM_OBJ_TYPE geom_obj_type) {
+	int n_bytes_per_vertex;
+
+	n_bytes_per_vertex = GEOM_OBJ_ELEMENTS_PER_VERTEX[geom_obj_type] * sizeof(float);
+	geom_obj_n_triangles[geom_obj_ID] = read_geometry_file(&geom_obj_vertices[geom_obj_ID], (char*)filename, geom_obj_type);
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &geom_obj_VAO[geom_obj_ID]);
+	glBindVertexArray(geom_obj_VAO[geom_obj_ID]);
+	glGenBuffers(1, &geom_obj_VBO[geom_obj_ID]);
+	glBindBuffer(GL_ARRAY_BUFFER, geom_obj_VBO[geom_obj_ID]);
+	glBufferData(GL_ARRAY_BUFFER, 3 * geom_obj_n_triangles[geom_obj_ID] * n_bytes_per_vertex,
+		geom_obj_vertices[geom_obj_ID], GL_STATIC_DRAW);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	if (geom_obj_type >= GEOM_OBJ_TYPE_VN) {
+		glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+	}
+	if (geom_obj_type >= GEOM_OBJ_TYPE_VNT) {
+		glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	free(geom_obj_vertices[geom_obj_ID]);
+}
+
+void draw_geom_obj(int geom_obj_ID) {
+	glBindVertexArray(geom_obj_VAO[geom_obj_ID]);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * geom_obj_n_triangles[geom_obj_ID]);
+	glBindVertexArray(0);
+}
+
+void free_geom_obj(int geom_obj_ID) {
+	glDeleteVertexArrays(1, &geom_obj_VAO[geom_obj_ID]);
+	glDeleteBuffers(1, &geom_obj_VBO[geom_obj_ID]);
+}
+
+
+float rad = 1.7f;
+float ww = 1.0f;
+void draw_wheel_and_nut() {
+	// angle is used in Hierarchical_Car_Correct later
+	int i;
+
+	glUniform3f(loc_primitive_color, 0.000f, 0.808f, 0.820f); // color name: DarkTurquoise
+	draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL); // draw wheel
+
+	for (i = 0; i < 5; i++) {
+		ModelMatrix_CAR_NUT = glm::rotate(ModelMatrix_CAR_WHEEL, TO_RADIAN*72.0f*i, glm::vec3(0.0f, 0.0f, 1.0f));
+		ModelMatrix_CAR_NUT = glm::translate(ModelMatrix_CAR_NUT, glm::vec3(rad - 0.5f, 0.0f, ww));
+		ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_NUT;
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+
+		glUniform3f(loc_primitive_color, 0.690f, 0.769f, 0.871f); // color name: LightSteelBlue
+		draw_geom_obj(GEOM_OBJ_ID_CAR_NUT); // draw i-th nut
+	}
+}
+
+float rotation_angle_car = 0.0f;
+
+void draw_car_dummy(void) {
+	glUniform3f(loc_primitive_color, 0.498f, 1.000f, 0.831f); // color name: Aquamarine
+	draw_geom_obj(GEOM_OBJ_ID_CAR_BODY); // draw body
+
+	glLineWidth(2.0f);
+	draw_axes(); // draw MC axes of body
+	glLineWidth(1.0f);
+
+	ModelMatrix_CAR_DRIVER = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(-3.0f, 0.5f, 2.5f));
+	ModelMatrix_CAR_DRIVER = glm::rotate(ModelMatrix_CAR_DRIVER, TO_RADIAN*90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_DRIVER;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	glLineWidth(5.0f);
+	draw_axes(); // draw camera frame at driver seat
+	glLineWidth(1.0f);
+
+	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(-3.9f, -3.5f, 4.5f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_wheel_and_nut();  // draw wheel 0
+
+	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, 4.5f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_wheel_and_nut();  // draw wheel 1
+
+	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(-3.9f, -3.5f, -4.5f));
+	ModelMatrix_CAR_WHEEL = glm::scale(ModelMatrix_CAR_WHEEL, glm::vec3(1.0f, 1.0f, -1.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_wheel_and_nut();  // draw wheel 2
+
+	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, -4.5f));
+	ModelMatrix_CAR_WHEEL = glm::scale(ModelMatrix_CAR_WHEEL, glm::vec3(1.0f, 1.0f, -1.0f));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_wheel_and_nut();  // draw wheel 3
 }
