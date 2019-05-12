@@ -59,34 +59,47 @@ void display_camera(int camera_index) {
 
 	// draw green
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(90, 90, 90));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(105, 90, 90));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	draw_partial(51, 204, 51);	// green
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100, 100, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(115, 100, 100));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_partial_line(255, 255, 0);
 
 	// draw water
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100, 100, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(115, 100, 100));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	draw_partial(153, 255, 255);	// blue
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	// draw car path
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(142.5, 113, 120));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_partial_line(255, 255, 255);
+
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(142.5, 113, 120));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_partial_line(255, 255, 255);
 
 	// draw CAR
-	ModelMatrix_CAR_BODY = glm::rotate(glm::mat4(1.0f), -rotation_angle_car, glm::vec3(0.0f, 1.0f, 0.0f));
-	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(20.0f, 4.89f, 0.0f));
-	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
+	//ModelMatrix_CAR_BODY = glm::rotate(glm::mat4(1.0f), -rotation_angle_car, glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 3.0f, 3.0f));
+	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(20.0f, 4.89f, 5.0f));
+	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car_dummy();
+
+
 
 }
 
