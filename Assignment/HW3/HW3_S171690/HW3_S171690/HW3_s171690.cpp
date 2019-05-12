@@ -499,7 +499,33 @@ void cleanup(void) {
 	glDeleteVertexArrays(1, &plane_VAO);
 	glDeleteBuffers(1, &plane_VBO);
 
+	glDeleteVertexArrays(1, &partial_VAO);
+	glDeleteBuffers(1, &partial_VBO);
+
+	glDeleteVertexArrays(1, &points_VAO);
+	glDeleteBuffers(1, &points_VBO);
+
+	glDeleteVertexArrays(1, &circle_VAO);
+	glDeleteBuffers(1, &circle_VBO);
+
+	glDeleteVertexArrays(1, &plane_VAO);
+	glDeleteBuffers(1, &plane_VBO);
+
+	glDeleteVertexArrays(1, &cylinder_VAO);
+	glDeleteBuffers(1, &cylinder_VBO);
 	
+	glDeleteVertexArrays(1, &cow_VAO);
+	glDeleteBuffers(1, &cow_VBO);
+
+	glDeleteVertexArrays(1, &tiger_VAO);
+	glDeleteBuffers(1, &tiger_VBO);
+
+	glDeleteVertexArrays(1, &spider_VAO);
+	glDeleteBuffers(1, &spider_VBO);
+
+	glDeleteVertexArrays(1, &ben_VAO);
+	glDeleteBuffers(1, &ben_VBO);
+
 	free_geom_obj(GEOM_OBJ_ID_CAR_BODY);
 	free_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
 	free_geom_obj(GEOM_OBJ_ID_CAR_NUT);
