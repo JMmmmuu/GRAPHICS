@@ -340,20 +340,51 @@ void mousePressed(int button, int state, int x, int y) {
 	if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)) {
 		prevx = x, prevy = y;
 		leftbutton_pressed = 1;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 	}
 	else if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_UP)) {
 		leftbutton_pressed = 0;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 	}
 }
 
 #define CAM_ROT_SENSITIVITY 0.15f
+#define CAM_ZOOM_STEP			0.03f
+#define CAM_MAX_ZOOM_IN_FACTOR	0.20f
+#define CAM_MAX_ZOOM_OUT_FACTOR	2.50f
+
 void motion(int x, int y) {
+	if (view_mode != VIEW_WORLD) return;
+
 	glm::mat4 mat4_tmp;
 	glm::vec3 vec3_tmp;
 	float delx, dely;
 
+	if (glutGetModifiers() == GLUT_ACTIVE_SHIFT && leftbutton_pressed) {
+		printf("hi\n");
+
+		delx = (float)(x - prevx);
+		if (delx < 0) {
+			camera[0].zoom_factor += CAM_ZOOM_STEP;
+			if (camera[0].zoom_factor > CAM_MAX_ZOOM_OUT_FACTOR)
+				camera[0].zoom_factor = CAM_MAX_ZOOM_OUT_FACTOR;
+			ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
+			ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+			ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+			glutPostRedisplay();
+		}
+		else if (delx > 0) {
+			camera[0].zoom_factor -= CAM_ZOOM_STEP;
+			if (camera[0].zoom_factor < CAM_MAX_ZOOM_IN_FACTOR)
+				camera[0].zoom_factor = CAM_MAX_ZOOM_IN_FACTOR;
+			ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
+			ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+			ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+			glutPostRedisplay();
+		}
+
+	}
+	/*
 	if (leftbutton_pressed) {
 		delx = (float)(x - prevx), dely = -(float)(y - prevy);
 		prevx = x, prevy = y;
@@ -377,8 +408,9 @@ void motion(int x, int y) {
 
 		ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
 		glutPostRedisplay();
-	}
+	}*/
 }
+
 
 void keyboard(unsigned char key, int x, int y) {
 	switch (key) {
@@ -445,8 +477,8 @@ void cleanup(void) {
 void register_callbacks(void) {
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
-	//glutSpecialFunc(special);
 	glutMouseFunc(mousePressed);
+	//glutSpecialFunc(special);
 	glutMotionFunc(motion);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(100, timer_scene, 0);

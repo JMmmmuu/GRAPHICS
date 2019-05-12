@@ -578,7 +578,6 @@ void draw_spider(void) {
 void draw_ben(void) {
 	glFrontFace(GL_CW);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBindVertexArray(ben_VAO);
 	glDrawArrays(GL_TRIANGLES, ben_vertex_offset[cur_frame_ben], 3 * ben_n_triangles[cur_frame_ben]);
 	glBindVertexArray(0);
