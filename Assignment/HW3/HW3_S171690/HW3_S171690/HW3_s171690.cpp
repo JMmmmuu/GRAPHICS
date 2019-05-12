@@ -54,7 +54,7 @@ void display_camera(int camera_index) {
 	glLineWidth(1.0f);
 
 	// draw floor
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 0));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, -0.5));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(150, 150, 150));
 	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-2.0f, -1.5f, 0.0f));
 
@@ -64,7 +64,7 @@ void display_camera(int camera_index) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// draw green
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-142.5f, 0.0f, 0.f));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(105, 90, 90));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -97,7 +97,7 @@ void display_camera(int camera_index) {
 
 	// draw CAR
 	//ModelMatrix_CAR_BODY = glm::rotate(glm::mat4(1.0f), -rotation_angle_car, glm::vec3(0.0f, 1.0f, 0.0f));
-	ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 3.0f, 3.0f));
+	/*ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 3.0f, 3.0f));
 	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 5.0f));
 	
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, (car_rotation_angle + 90.0f) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -105,7 +105,7 @@ void display_camera(int camera_index) {
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_car_dummy();
+	draw_car_dummy();*/
 
 
 	//ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(142.5f, 113.0f, 3.0f));
@@ -135,7 +135,7 @@ void display_camera(int camera_index) {
 
 	// draw spider
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(100.0f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100.0f, 100.0f, 100.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(70.0f, 70.0f, 70.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
 
@@ -145,7 +145,7 @@ void display_camera(int camera_index) {
 
 	// draw ben
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(ben_pos_x * 110.0f - 142.5f, ben_pos_y * 95.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(70.0f, 70.0f, 70.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(40.0f, 40.0f, 40.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, ben_rotation_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 

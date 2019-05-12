@@ -123,7 +123,7 @@ void draw_partial(GLfloat r, GLfloat g, GLfloat b) {
 	glUniform3fv(loc_primitive_color, 1, partial_color);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 366);
 	glBindVertexArray(0);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 void draw_partial_line(GLfloat r, GLfloat g, GLfloat b) {
 	glFrontFace(GL_CCW);
