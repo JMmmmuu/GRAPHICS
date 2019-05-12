@@ -348,9 +348,9 @@ void mousePressed(int button, int state, int x, int y) {
 	}
 }
 
-#define CAM_ROT_SENSITIVITY 0.15f
+#define CAM_ROT_SENSITIVITY		0.50f
 #define CAM_ZOOM_STEP			0.03f
-#define CAM_MAX_ZOOM_IN_FACTOR	0.20f
+#define CAM_MAX_ZOOM_IN_FACTOR	0.10f
 #define CAM_MAX_ZOOM_OUT_FACTOR	2.50f
 
 void motion(int x, int y) {
@@ -361,8 +361,6 @@ void motion(int x, int y) {
 	float delx, dely;
 
 	if (glutGetModifiers() == GLUT_ACTIVE_SHIFT && leftbutton_pressed) {
-		printf("hi\n");
-
 		delx = (float)(x - prevx);
 		if (delx < 0) {
 			camera[0].zoom_factor += CAM_ZOOM_STEP;
@@ -382,7 +380,6 @@ void motion(int x, int y) {
 			ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 			glutPostRedisplay();
 		}
-
 	}
 	/*
 	if (leftbutton_pressed) {
@@ -422,6 +419,7 @@ void keyboard(unsigned char key, int x, int y) {
 			glutPostRedisplay();
 			break;*/
 	case 'w':
+		set_ViewMatrix_for_world_viewer();
 		view_mode = VIEW_WORLD;
 		break;
 	case 'c':	// CAR DRIVER PERSPECTIVE
@@ -441,6 +439,40 @@ void keyboard(unsigned char key, int x, int y) {
 		glutLeaveMainLoop();
 		break;
 	}
+}
+
+void special(int key, int x, int y) {
+	glm::vec3 n, u;
+	glm::mat4 tmp;
+
+	switch (key) {
+	case GLUT_KEY_UP:
+		n = camera[0].prp - camera[0].vrp;
+		u = cross(camera[0].vup, n);
+		tmp = glm::rotate(glm::mat4(1.0f), -CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+
+		camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
+		camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
+		break;
+	case GLUT_KEY_DOWN:
+		n = camera[0].prp - camera[0].vrp;
+		u = cross(camera[0].vup, n);
+		tmp = glm::rotate(glm::mat4(1.0f), CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+
+		camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
+		camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
+		break;
+	case GLUT_KEY_LEFT:
+		break;
+	case GLUT_KEY_RIGHT:
+		break;
+	}
+
+	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+	ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+
+	glutPostRedisplay();
 }
 
 void reshape(int width, int height) {
@@ -478,7 +510,7 @@ void register_callbacks(void) {
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutMouseFunc(mousePressed);
-	//glutSpecialFunc(special);
+	glutSpecialFunc(special);
 	glutMotionFunc(motion);
 	glutReshapeFunc(reshape);
 	glutTimerFunc(100, timer_scene, 0);
