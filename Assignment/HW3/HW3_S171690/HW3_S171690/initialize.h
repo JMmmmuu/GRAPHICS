@@ -52,12 +52,12 @@ void initialize_OpenGL() {
 	/*
 	ModelMatrix_CAR_BODY = glm::mat4(1.0f);
 	ModelMatrix_CAR_WHEEL = glm::mat4(1.0f);
-	ModelMatrix_CAR_NUT = glm::mat4(1.0f);
+	ModelMatrix_CAR_NUT = glm::mat4(1.0f);*/
 
 	// the transformation that moves the driver's camera frame from car body's MC to driver seat
 	ModelMatrix_CAR_BODY_to_DRIVER = glm::translate(glm::mat4(1.0f), glm::vec3(-3.0f, 0.5f, 2.5f));
 	ModelMatrix_CAR_BODY_to_DRIVER = glm::rotate(ModelMatrix_CAR_BODY_to_DRIVER,
-		TO_RADIAN*90.0f, glm::vec3(0.0f, 1.0f, 0.0f));*/
+		TO_RADIAN*90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glClearColor(0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -69,6 +69,8 @@ void prepare_scene() {
 	prepare_partial();
 	prepare_axes();
 	prepare_points();
+	prepare_circle();
+	prepare_cylinder();
 	
 	prepare_ben();
 	prepare_cow();

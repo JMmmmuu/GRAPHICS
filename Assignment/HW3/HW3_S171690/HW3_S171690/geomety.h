@@ -123,7 +123,6 @@ void draw_partial(GLfloat r, GLfloat g, GLfloat b) {
 	glUniform3fv(loc_primitive_color, 1, partial_color);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 366);
 	glBindVertexArray(0);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 void draw_partial_line(GLfloat r, GLfloat g, GLfloat b) {
 	glFrontFace(GL_CCW);
@@ -205,6 +204,114 @@ void draw_points(float r, float g, float b) {
 	glBindVertexArray(0);
 }
 
+GLuint circle_VBO, circle_VAO;
+GLfloat circle_vertices[362][8];
+
+void prepare_circle() {
+	// set circle vertices
+	int i;
+	circle_vertices[0][0] = 0; circle_vertices[0][1] = 0; circle_vertices[0][2] = 0;
+	circle_vertices[0][3] = circle_vertices[0][4] = circle_vertices[0][6] = circle_vertices[0][7] = 0;
+	circle_vertices[0][5] = 1;
+
+	for (i = 0; i < 360; i++) {
+		circle_vertices[i + 1][0] = cos(i * TO_RADIAN); circle_vertices[i + 1][1] = sin(i * TO_RADIAN);
+		circle_vertices[i + 1][2] = circle_vertices[i + 1][3] = circle_vertices[i + 1][4] = circle_vertices[i + 1][6] = circle_vertices[i + 1][7] = 0;
+		circle_vertices[i + 1][5] = 1;
+	}
+	circle_vertices[361][0] = 1; circle_vertices[361][1] = 0; circle_vertices[361][2] = 0;
+	circle_vertices[361][3] = circle_vertices[361][4] = circle_vertices[361][6] = circle_vertices[361][7] = 0;
+	circle_vertices[361][5] = 1;
+
+	// Initialize vertex buffer object.
+	glGenBuffers(1, &circle_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, circle_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(circle_vertices), &circle_vertices[0][0], GL_STATIC_DRAW);
+
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &circle_VAO);
+	glBindVertexArray(circle_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, circle_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_circle() {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	GLfloat color[3] = { 180.0f / 255, 0.0f / 255, 0.0f / 255 };
+	glBindVertexArray(circle_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
+	glBindVertexArray(0);
+}
+
+GLuint cylinder_VBO, cylinder_VAO;
+GLfloat cylinder_vertices[722][8];
+
+void prepare_cylinder() {
+	// set cylinder vertices
+	int i;
+	for (i = 0; i < 722; i += 2) {
+		cylinder_vertices[i][0] = cos(i * TO_RADIAN); cylinder_vertices[i][1] = sin(i * TO_RADIAN); cylinder_vertices[i][2] = 0;
+		cylinder_vertices[i][3] = cos(i * TO_RADIAN);
+		cylinder_vertices[1][4] = sin(i * TO_RADIAN);
+		cylinder_vertices[i][5] = cylinder_vertices[i][6] = cylinder_vertices[i][7] = 0;
+
+
+		cylinder_vertices[i + 1][0] = cos(i * TO_RADIAN); cylinder_vertices[i + 1][1] = sin(i * TO_RADIAN); cylinder_vertices[i+1][2] = 1;
+		cylinder_vertices[i + 1][3] = cos(i * TO_RADIAN);
+		cylinder_vertices[i + 1][4] = sin(i * TO_RADIAN);
+		cylinder_vertices[i + 1][5] = cylinder_vertices[i + 1][6] = cylinder_vertices[i + 1][7] = 0;
+
+		//printf("%d\t%.2f %.2f %.2f\n\t%.2f %.2f %.2f\n\n", i, cylinder_vertices[i][0], cylinder_vertices[i][1], cylinder_vertices[i][2],
+			//cylinder_vertices[i + 1][0], cylinder_vertices[i + 1][1], cylinder_vertices[i + 1][2]);
+	}
+
+	// Initialize vertex buffer object.
+	glGenBuffers(1, &cylinder_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, cylinder_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cylinder_vertices), &cylinder_vertices[0][0], GL_STATIC_DRAW);
+
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &cylinder_VAO);
+	glBindVertexArray(cylinder_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, cylinder_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_cylinder() {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	GLfloat color[3] = { 255.0f / 255, 0.0f / 255, 0.0f / 255 };
+	glBindVertexArray(cylinder_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 722);
+	glBindVertexArray(0);
+}
 
 
 
@@ -471,6 +578,7 @@ void draw_spider(void) {
 void draw_ben(void) {
 	glFrontFace(GL_CW);
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBindVertexArray(ben_VAO);
 	glDrawArrays(GL_TRIANGLES, ben_vertex_offset[cur_frame_ben], 3 * ben_n_triangles[cur_frame_ben]);
 	glBindVertexArray(0);
@@ -635,3 +743,4 @@ void draw_car_dummy(void) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_wheel_and_nut();  // draw wheel 3
 }
+
