@@ -133,8 +133,9 @@ void display_camera(int camera_index) {
 
 
 	// DRAW SPIDER
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(82.5f, 0.0f, 100.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], spider_pos);
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(20.0f, 20.0f, 20.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, spider_rotation_angle*TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
@@ -197,26 +198,26 @@ void display_camera(int camera_index) {
 	}
 
 
-	// DRAW ROCKS
+	// DRAW BRICKS
 	float y = (11 + 20) / 17.0f;
 
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(202.5, -80, 100));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj1();
 	
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(82.5, 0, 100));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(82.5, 18, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj2();
 
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 120, 100));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 110, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj3();
@@ -376,7 +377,7 @@ void timer_scene(int value) {
 		ben_idx += 3;
 	}
 
-
+	get_spider_pos();
 
 	glutPostRedisplay();
 	glutTimerFunc(10, timer_scene, (value + 1) % INT_MAX);
@@ -416,6 +417,7 @@ void timer_scene_2(int value) {
 unsigned int leftbutton_pressed = 0;
 int prevx, prevy;
 void mousePressed(int button, int state, int x, int y) {
+	view_brick = 0;
 	if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)) {
 		prevx = x, prevy = y;
 		leftbutton_pressed = 1;
@@ -431,6 +433,8 @@ void mousePressed(int button, int state, int x, int y) {
 #define CAM_MAX_ZOOM_OUT_FACTOR	2.50f
 
 void motion(int x, int y) {
+	view_brick = 0;
+
 	if (!(view_mode == VIEW_WORLD || view_mode == VIEW_CAR || view_mode == VIEW_TIGER)) return;
 
 	glm::mat4 mat4_tmp;
@@ -485,6 +489,7 @@ void motion(int x, int y) {
 
 
 void keyboard(unsigned char key, int x, int y) {
+	view_brick = 0;
 	switch (key) {
 		/*case 'f':
 			flag_fog = 1 - flag_fog;
@@ -508,6 +513,14 @@ void keyboard(unsigned char key, int x, int y) {
 		view_mode = VIEW_CAR;
 
 		break;
+
+	case 'b':
+		set_Cam_to_Brick();
+		view_mode = VIEW_BRICK;
+		view_brick = 1;
+		break;
+
+
 	case 'r':
 		reset_CAM();
 		break;
@@ -526,6 +539,7 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void special(int key, int x, int y) {
+	view_brick = 0;
 	if (view_mode == DRIVER_PERS) return;
 	glm::vec3 n, u, v;
 	glm::mat4 tmp;

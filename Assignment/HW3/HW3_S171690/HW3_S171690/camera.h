@@ -8,7 +8,7 @@ typedef struct {
 } VIEWPORT;
 
 typedef enum {
-	VIEW_WORLD, VIEW_TIGER, VIEW_CAR, DRIVER_PERS, TIGER_PERS
+	VIEW_WORLD, VIEW_TIGER, VIEW_CAR, DRIVER_PERS, TIGER_PERS, VIEW_BRICK
 } VIEW_MODE;
 
 CAMERA camera[NUMBER_OF_CAMERAS];
@@ -69,6 +69,19 @@ void set_ViewMatrix_for_TIGER(float tiger_pos_x, float tiger_pos_y) {
 	camera[0].prp[0] = camera[0].vrp[0] + 30;
 	camera[0].prp[1] = camera[0].vrp[1] + 30;
 	camera[0].prp[2] = camera[0].vrp[2] + 30;
+	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);
+
+	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
+	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+}
+
+int view_brick = 0;
+void set_Cam_to_Brick() {
+	set_ViewMatrix_for_world_viewer();
+
+	camera[0].vrp = glm::vec3(82.5f, 20.0f, 100.0f);
+	camera[0].prp = glm::vec3(500.0f, 20.0f, 100.0f);
 	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);
 
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);

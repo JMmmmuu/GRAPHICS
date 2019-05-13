@@ -87,3 +87,31 @@ int cow_tiger_collision() { //int theta, float tiger_x, float tiger_y) {
 		return 0;
 	}
 }
+
+glm::vec3 spider_pos = { 82.5f, 0.0f, 100.0f };
+int spider_rotation_angle = 0;
+float spider_speed = 0.5;
+void get_spider_pos() {
+	float y_range[2];
+
+	if (view_brick) {
+		y_range[0] = 18 - 135.0f / 2 - 90;
+		y_range[1] = 18 + 135.0f / 2 + 54;
+	}
+	else {
+		y_range[0] = 18 - 135.0f / 2;
+		y_range[1] = 18 + 135.0f / 2;
+	}
+
+	if (spider_rotation_angle == 0) {
+		spider_pos[1] += spider_speed;
+		if (spider_pos[1] + 15 >= y_range[1]) {
+			spider_rotation_angle = 180;
+		}
+	}
+	else {
+		spider_pos[1] -= spider_speed;
+		if (spider_pos[1] - 15 <= y_range[0])
+			spider_rotation_angle = 0;
+	}
+}
