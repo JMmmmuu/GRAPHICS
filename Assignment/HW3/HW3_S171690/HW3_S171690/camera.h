@@ -90,7 +90,11 @@ void reset_CAM() {
 	camera[0].far_clip = 1200.0f;
 	camera[0].zoom_factor = 1.0f;
 
+	view_mode = VIEW_WORLD;
+
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
 	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+
+	glutPostRedisplay();
 }
