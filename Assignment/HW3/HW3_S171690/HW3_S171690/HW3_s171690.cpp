@@ -196,28 +196,32 @@ void display_camera(int camera_index) {
 		draw_cow();
 	}
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 200));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(3.0f, 3.0f, 3.0f));
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(0, 0, 1));
+
+	// DRAW ROCKS
+	float y = (11 + 20) / 17.0f;
+
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(200, -80 - 20, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj1();
 	
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(100, 0, 200));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(3.0f, 3.0f, 3.0f));
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(0, 0, 1));
 
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(70, 0 - 20, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj2();
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(250, 0, 200));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(3.0f, 3.0f, 3.0f));
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(0, 0, 1));
 
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 120 - 20, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj3();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
 
