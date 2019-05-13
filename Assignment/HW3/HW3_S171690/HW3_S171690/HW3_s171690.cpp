@@ -133,8 +133,8 @@ void display_camera(int camera_index) {
 
 
 	// DRAW SPIDER
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(100.0f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(70.0f, 70.0f, 70.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(90.0f, 0.0f, 100.0f));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(20.0f, 20.0f, 20.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
@@ -204,7 +204,6 @@ void display_camera(int camera_index) {
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj1();
 	
