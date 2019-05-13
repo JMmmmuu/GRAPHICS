@@ -156,38 +156,35 @@ void display_camera(int camera_index) {
 	if (cow_tiger_collide) {
 		
 		// cylinder at current cow position
-		//if (cylinder_status != 2) {
-			ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], prev_cow_pos);
-			ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(14.0f, 14.0f, 14.0f * cylinder_z_1));
+		ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], prev_cow_pos);
+		ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(14.0f, 14.0f, 14.0f * cylinder_z_1));
 
-			glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glUniform3f(loc_primitive_color, 178 / 255.0f, 132 / 255.0f, 190 / 255.0f);
-			draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
-		//}
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glUniform3f(loc_primitive_color, 178 / 255.0f, 132 / 255.0f, 190 / 255.0f);
+		draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
+		
 
 		// cylinder at rand position
-		//if (cylinder_status != 0) {
-			ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
-			ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(14.0f, 14.0f, 14.0f * cylinder_z_2));
+		ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
+		ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(14.0f, 14.0f, 14.0f * cylinder_z_2));
 
-			glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glUniform3f(loc_primitive_color, 178 / 255.0f, 132 / 255.0f, 190 / 255.0f);
-			draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
-		//}
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glUniform3f(loc_primitive_color, 178 / 255.0f, 132 / 255.0f, 190 / 255.0f);
+		draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
+		
 
 		// draw cow
-		//if (cylinder_status != 1) {
-			ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
-			ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
-			ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(40.0f, 40.0f, 40.0f));
+		ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
+		ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+		ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(40.0f, 40.0f, 40.0f));
 
-			glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-			draw_cow();
-		//}
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		draw_cow();
+		
 
 
 	}
@@ -202,12 +199,6 @@ void display_camera(int camera_index) {
 
 
 	
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100.0f, 100.0f, 0.0f));
-
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	//draw_circle();
-
 
 
 
@@ -219,8 +210,6 @@ void display() {
 	display_camera(0);
 	//display_camera(1);
 	glutSwapBuffers();
-
-
 
 }
 
@@ -376,9 +365,6 @@ void timer_scene_2(int value) {
 	static int flag = 0;
 
 	if (cow_tiger_collide) {
-		//switch (cylinder_status) {
-		//case 0:
-
 		if (!flag) {
 			flag = 1;
 			prev_cow_pos = cow_pos;
@@ -388,53 +374,16 @@ void timer_scene_2(int value) {
 
 			sign = rand() % 2 ? 1 : -1;
 			cow_pos[1] = y * (rand() % 80) * sign;
-
-			//tmp = 70 + y * (rand() % 20);
-			//if (prev_cow_pos[1] + tmp <= y * 90.0f) cow_pos[1] = prev_cow_pos[1] + tmp;
-			//else cow_pos[1] = prev_cow_pos[1] - y;
-
 		}
 
-		cylinder_z_1 += 0.01;
-		cylinder_z_2 += 0.01;
+		cylinder_z_1 += 0.02;
+		cylinder_z_2 += 0.02;
 		if (cylinder_z_1 >= 1) {
-			prev_cow_pos = cow_pos;
-
-			sign = rand() % 2 ? 1 : -1;
-			cow_pos[0] = -142.5f + (rand() % 95) * sign;
-
-			sign = rand() % 2 ? 1 : -1;
-			cow_pos[1] = y * (rand() % 80) * sign;
-
 			cylinder_z_1 = 0;
 			cylinder_z_2 = 0;
 			cow_tiger_collide = 0;
 			flag = 0;
-				//cylinder_status = 1;
 		}
-			//break;
-		/*case 1:
-			cylinder_z_1 -= 0.01;
-			cylinder_z_2 += 0.01;
-			if (cylinder_z_2 >= 1) {
-				cylinder_z_2 = 1;
-				cylinder_z_1 = 0;
-				cylinder_status = 2;
-			}
-			break;
-		case 2:
-			cylinder_z_2 -= 0.01;
-			if (cylinder_z_2 <= 0) {
-				cylinder_z_1 = 0;
-				cylinder_z_2 = 0;
-				cow_tiger_collide = 0;
-				cylinder_status = 0;
-
-			}
-			break;
-
-		}*/
-
 	}
 
 	glutTimerFunc(1, timer_scene_2, (value + 1) % INT_MAX);
