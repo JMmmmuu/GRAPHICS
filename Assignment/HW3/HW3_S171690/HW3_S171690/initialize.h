@@ -24,7 +24,7 @@ void initialize_OpenGL() {
 	// initialize the 0th camera.
 	camera[0].prp = glm::vec3(500.0f, 400.0f, 400.0f);
 	camera[0].vrp = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera[0].vup = glm::vec3(0.0f, 1.0f, 0.0f);
+	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	//camera[0].vup = glm::vec3(ViewMatrix[0][0].y, ViewMatrix[0][1].y, ViewMatrix[0][2].y); // in this example code, make vup always equal to the v direction.
 
@@ -38,7 +38,7 @@ void initialize_OpenGL() {
 	//initialize the 1st camera.
 	camera[1].prp = glm::vec3(0.0f, 20.0f, 0.0f);
 	camera[1].vrp = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera[1].vup = glm::vec3(0.0f, 0.0f, 1.0f);
+	camera[1].vup = glm::vec3(0.0f, -1.0f, 0.0f);
 	ViewMatrix[1] = glm::lookAt(camera[1].prp, camera[1].vrp, camera[1].vup);
 	camera[1].vup = glm::vec3(ViewMatrix[1][0].y, ViewMatrix[1][1].y, ViewMatrix[1][2].y); // in this example code, make vup always equal to the v direction.
 

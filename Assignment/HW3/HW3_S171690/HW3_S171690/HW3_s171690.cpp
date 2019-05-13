@@ -116,6 +116,7 @@ void display_camera(int camera_index) {
 	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 1.0f));
 
 	if (view_mode == DRIVER_PERS) set_ViewMatrix_for_driver();
+	if (view_mode == VIEW_CAR) set_ViewMatrix_for_CAR(car_left_flag, car_pos_x, car_pos_y);
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
@@ -357,7 +358,7 @@ void mousePressed(int button, int state, int x, int y) {
 #define CAM_MAX_ZOOM_OUT_FACTOR	2.50f
 
 void motion(int x, int y) {
-	if (view_mode != VIEW_WORLD) return;
+	if (!(view_mode == VIEW_WORLD || view_mode == VIEW_CAR || view_mode == VIEW_TIGER)) return;
 
 	glm::mat4 mat4_tmp;
 	glm::vec3 vec3_tmp;
@@ -371,7 +372,7 @@ void motion(int x, int y) {
 				camera[0].zoom_factor = CAM_MAX_ZOOM_OUT_FACTOR;
 			ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
 			ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-			ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+			//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 			glutPostRedisplay();
 		}
 		else if (delx > 0) {
@@ -380,7 +381,7 @@ void motion(int x, int y) {
 				camera[0].zoom_factor = CAM_MAX_ZOOM_IN_FACTOR;
 			ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
 			ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-			ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+			//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 			glutPostRedisplay();
 		}
 	}
@@ -432,10 +433,13 @@ void keyboard(unsigned char key, int x, int y) {
 		view_mode = TIGER_PERS;
 		break;
 	case 'c':	// VIEW CAR
-		set_ViewMatrix_for_CAR(car_left_flag, car_pos_x, car_pos_y);
+		set_ViewMatrix_for_world_viewer();
 		view_mode = VIEW_CAR;
-		glutPostRedisplay();
+		//glutPostRedisplay();
 
+		break;
+	case 'r':
+		reset_CAM();
 		break;
 	case 'p':
 		flag_polygon_fill = 1 - flag_polygon_fill;
@@ -487,7 +491,7 @@ void special(int key, int x, int y) {
 
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-	ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 
 	glutPostRedisplay();
 }
@@ -498,7 +502,7 @@ void reshape(int width, int height) {
 	viewport[0].w = (int)(width); viewport[0].h = (int)(height);
 	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio,camera[0].near_clip, camera[0].far_clip);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-	ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
+	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 
 	camera[1].aspect_ratio = camera[0].aspect_ratio; // for the time being ...
 	viewport[1].x = (int)(0.75f*width); viewport[1].y = (int)(0.75f*height);
