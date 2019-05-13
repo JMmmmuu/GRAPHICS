@@ -61,6 +61,23 @@ void set_ViewMatrix_for_CAR(int car_left_flag, float car_pos_x, float car_pos_y)
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
 }
 
+void set_ViewMatrix_for_TIGER(float tiger_pos_x, float tiger_pos_y) {
+	set_ViewMatrix_for_world_viewer();
+
+	camera[0].vrp[0] = tiger_pos_x;
+	camera[0].vrp[1] = tiger_pos_y;
+	camera[0].vrp[2] = 0;
+
+	camera[0].prp[0] = camera[0].vrp[0] + 30;
+	camera[0].prp[1] = camera[0].vrp[1] + 30;
+	camera[0].prp[2] = camera[0].vrp[2] + 30;
+	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);
+
+	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
+	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
+}
+
 void reset_CAM() {
 	camera[0].prp = glm::vec3(500.0f, 400.0f, 400.0f);
 	camera[0].vrp = glm::vec3(0.0f, 0.0f, 0.0f);

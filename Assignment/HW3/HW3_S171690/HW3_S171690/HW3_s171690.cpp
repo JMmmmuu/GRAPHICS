@@ -116,19 +116,20 @@ void display_camera(int camera_index) {
 	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 1.0f));
 
 	if (view_mode == DRIVER_PERS) set_ViewMatrix_for_driver();
-	if (view_mode == VIEW_CAR) set_ViewMatrix_for_CAR(car_left_flag, car_pos_x, car_pos_y);
+	else if (view_mode == VIEW_CAR) set_ViewMatrix_for_CAR(car_left_flag, car_pos_x, car_pos_y);
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_car_dummy();
 	
 	// DRAW TIGER
-	ModelMatrix_TIGER = glm::rotate(glm::mat4(1.0f), 90 * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelMatrix_TIGER = glm::translate(ModelMatrix_TIGER, glm::vec3(-100.0f, 0.0f, 0.0f));
-	ModelMatrix_TIGER = glm::rotate(ModelMatrix_TIGER, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	//ModelMatrix_TIGER = glm::rotate(glm::mat4(1.0f), 90 * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix_TIGER = glm::translate(glm::mat4(1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
+	//ModelMatrix_TIGER = glm::rotate(ModelMatrix_TIGER, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 	ModelMatrix_TIGER = glm::scale(ModelMatrix_TIGER, glm::vec3(0.30f, 0.30f, 0.30f));
 
 	if (view_mode == TIGER_PERS) set_ViewMatrix_for_TIGER_PERS();
+	else if (view_mode == VIEW_TIGER) set_ViewMatrix_for_TIGER(tiger_pos_x, tiger_pos_y);
 
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_TIGER;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
