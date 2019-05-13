@@ -123,6 +123,7 @@ void draw_partial(GLfloat r, GLfloat g, GLfloat b) {
 	glUniform3fv(loc_primitive_color, 1, partial_color);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 366);
 	glBindVertexArray(0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 void draw_partial_line(GLfloat r, GLfloat g, GLfloat b) {
 	glFrontFace(GL_CCW);
@@ -255,6 +256,7 @@ void draw_circle() {
 	glUniform3fv(loc_primitive_color, 1, color);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
 	glBindVertexArray(0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 GLuint cylinder_VBO, cylinder_VAO;
@@ -311,6 +313,7 @@ void draw_cylinder() {
 	glUniform3fv(loc_primitive_color, 1, color);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 722);
 	glBindVertexArray(0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 
@@ -578,7 +581,6 @@ void draw_spider(void) {
 void draw_ben(void) {
 	glFrontFace(GL_CW);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glBindVertexArray(ben_VAO);
 	glDrawArrays(GL_TRIANGLES, ben_vertex_offset[cur_frame_ben], 3 * ben_n_triangles[cur_frame_ben]);
 	glBindVertexArray(0);
@@ -744,3 +746,196 @@ void draw_car_dummy(void) {
 	draw_wheel_and_nut();  // draw wheel 3
 }
 
+GLuint obj1_VBO, obj1_VAO;
+GLfloat obj1_vertices[26][8] = {
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, -15.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, -15.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 8.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 8.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 8.0f, -12.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 8.0f, -12.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 20.0f, -8.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 20.0f, -8.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 20.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 20.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+
+	{ 10.0f, 0.0f, -15.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 8.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 20.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 8.0f, -12.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 20.0f, -8.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+
+	{ 0.0f, 0.0f, -15.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 8.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 20.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 8.0f, -12.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 20.0f, -8.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+};
+
+void prepare_obj1() {
+	// initialize vertex buffer object
+	glGenBuffers(1, &obj1_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, obj1_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(obj1_vertices), &obj1_vertices[0][0], GL_STATIC_DRAW);
+
+	// Initialize vertex array object
+	glGenVertexArrays(1, &obj1_VAO);
+	glBindVertexArray(obj1_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obj1_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_obj1(void) {
+	glFrontFace(GL_CCW);
+
+	GLfloat color[3] = { 226.0f / 255, 226.0f / 255, 226.0f / 255 };
+	glBindVertexArray(obj1_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+	glDrawArrays(GL_TRIANGLE_STRIP, 14, 6);
+	glDrawArrays(GL_TRIANGLE_STRIP, 20, 6);
+	glBindVertexArray(0);
+}
+
+GLuint obj2_VBO, obj2_VAO;
+GLfloat obj2_vertices[26][8] = {
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, -21.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, -21.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 16.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 16.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 16.0f, -13.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 16.0f, -13.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+
+	{ 10.0f, 0.0f, -21.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 16.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 16.0f, -13.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+
+	{ 0.0f, 0.0f, -21.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 16.0f, -5.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 30.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 16.0f, -13.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 30.0f, -10.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+};
+
+void prepare_obj2() {
+	// initialize vertex buffer object
+	glGenBuffers(1, &obj2_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, obj2_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(obj2_vertices), &obj2_vertices[0][0], GL_STATIC_DRAW);
+
+	// Initialize vertex array object
+	glGenVertexArrays(1, &obj2_VAO);
+	glBindVertexArray(obj2_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obj2_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_obj2(void) {
+	glFrontFace(GL_CCW);
+
+	GLfloat color[3] = { 226.0f / 255, 226.0f / 255, 226.0f / 255 };
+	glBindVertexArray(obj2_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+	glDrawArrays(GL_TRIANGLE_STRIP, 14, 6);
+	glDrawArrays(GL_TRIANGLE_STRIP, 20, 6);
+	glBindVertexArray(0);
+}
+
+GLuint obj3_VBO, obj3_VAO;
+GLfloat obj3_vertices[22][8] = {
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, -18.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, -18.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 6.0f, -6.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 6.0f, -6.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 6.0f, -11.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 6.0f, -11.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 12.0f, -0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 12.0f, -0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+
+	{ 10.0f, 0.0f, -18.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 6.0f, -6.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 12.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 10.0f, 6.0f, -11.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+
+	{ 0.0f, 0.0f, -18.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 6.0f, -6.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 12.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+	{ 0.0f, 6.0f, -11.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f },
+};
+
+void prepare_obj3() {
+	// initialize vertex buffer object
+	glGenBuffers(1, &obj3_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, obj3_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(obj3_vertices), &obj3_vertices[0][0], GL_STATIC_DRAW);
+
+	// Initialize vertex array object
+	glGenVertexArrays(1, &obj3_VAO);
+	glBindVertexArray(obj3_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, obj3_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_obj3(void) {
+	glFrontFace(GL_CCW);
+
+	GLfloat color[3] = { 226.0f / 255, 226.0f / 255, 226.0f / 255 };
+	glBindVertexArray(obj3_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
+	glDrawArrays(GL_TRIANGLE_STRIP, 12, 5);
+	glDrawArrays(GL_TRIANGLE_STRIP, 17, 5);
+	glBindVertexArray(0);
+}

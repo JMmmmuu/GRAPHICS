@@ -176,6 +176,7 @@ void display_camera(int camera_index) {
 		glUniform3f(loc_primitive_color, 178 / 255.0f, 132 / 255.0f, 190 / 255.0f);
 		draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
 		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// draw cow
 		ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
@@ -184,8 +185,6 @@ void display_camera(int camera_index) {
 
 		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 		draw_cow();
-		
-
 
 	}
 	else {
@@ -197,8 +196,28 @@ void display_camera(int camera_index) {
 		draw_cow();
 	}
 
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 200));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(3.0f, 3.0f, 3.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(0, 0, 1));
 
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_obj1();
 	
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(100, 0, 200));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(3.0f, 3.0f, 3.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(0, 0, 1));
+
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_obj2();
+
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(250, 0, 200));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(3.0f, 3.0f, 3.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(0, 0, 1));
+
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_obj3();
 
 
 
@@ -355,6 +374,7 @@ void timer_scene(int value) {
 	}
 
 
+
 	glutPostRedisplay();
 	glutTimerFunc(10, timer_scene, (value + 1) % INT_MAX);
 }
@@ -370,14 +390,14 @@ void timer_scene_2(int value) {
 			prev_cow_pos = cow_pos;
 
 			sign = rand() % 2 ? 1 : -1;
-			cow_pos[0] = -142.5f + (rand() % 95) * sign;
+			cow_pos[0] = -142.5f + (rand() % 90) * sign;
 
 			sign = rand() % 2 ? 1 : -1;
 			cow_pos[1] = y * (rand() % 80) * sign;
 		}
 
-		cylinder_z_1 += 0.02;
-		cylinder_z_2 += 0.02;
+		cylinder_z_1 += 0.1;
+		cylinder_z_2 += 0.1;
 		if (cylinder_z_1 >= 1) {
 			cylinder_z_1 = 0;
 			cylinder_z_2 = 0;
@@ -386,6 +406,7 @@ void timer_scene_2(int value) {
 		}
 	}
 
+	glutPostRedisplay();
 	glutTimerFunc(1, timer_scene_2, (value + 1) % INT_MAX);
 }
 
@@ -421,7 +442,6 @@ void motion(int x, int y) {
 				camera[0].zoom_factor = CAM_MAX_ZOOM_OUT_FACTOR;
 			ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
 			ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-			//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 			glutPostRedisplay();
 		}
 		else if (delx > 0) {
@@ -430,7 +450,6 @@ void motion(int x, int y) {
 				camera[0].zoom_factor = CAM_MAX_ZOOM_IN_FACTOR;
 			ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
 			ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-			//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 			glutPostRedisplay();
 		}
 	}

@@ -74,6 +74,10 @@ void prepare_scene() {
 	prepare_points();
 	prepare_circle();
 	prepare_cylinder();
+
+	prepare_obj1();
+	prepare_obj2();
+	prepare_obj3();
 	
 	prepare_ben();
 	prepare_cow();
