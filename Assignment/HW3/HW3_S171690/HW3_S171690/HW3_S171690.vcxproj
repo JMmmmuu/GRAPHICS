@@ -152,6 +152,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="geomety.h" />
     <ClInclude Include="initialize.h" />
+    <ClInclude Include="myFunc.h" />
     <ClInclude Include="Shaders\LoadShaders.h" />
   </ItemGroup>
   <ItemGroup>

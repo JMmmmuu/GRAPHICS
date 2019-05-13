@@ -32,81 +32,8 @@ glm::mat4 ModelMatrix_TIGER, ModelMatrix_TIGER_PERS;
 int flag_polygon_fill = 0;
 
 #include "geomety.h"
-float car_pos_x, car_pos_y, car_rotation_angle;
-int car_left_flag = 1;
 
-float tiger_pos_x = -100.0f, tiger_pos_y = 30.0f;
-int tiger_rotation_angle = 0;
-float ben_pos_x, ben_pos_y, ben_rotation_angle;
-
-int outOfField() {
-	float r = 30.0f;
-	float y = (11 + 20) / 17.0f;
-
-	if (tiger_pos_x + r >= -142.5f + 105.0f)
-		return 1;
-	else if (tiger_pos_x - r <= -142.5f - 105.0f)
-		return 2;
-	else if (tiger_pos_y + r >= y * 90.0f)
-		return 3;
-	else if (tiger_pos_y - r <= -y * 90.0f)
-		return 4;
-
-	return 0;
-}
-
-void getTigerPos() {
-	srand(time(NULL));
-	//glm::vec3 tiger_pos;
-	const float tiger_speed = 1;
-	static glm::vec3 prev_tiger_pos;
-	static int theta = rand() % 360;
-	static int flag = 0;
-
-	prev_tiger_pos[0] = tiger_pos_x;
-	prev_tiger_pos[1] = tiger_pos_y;
-
-	tiger_pos_x += tiger_speed * cos(theta * TO_RADIAN);
-	tiger_pos_y += tiger_speed * sin(theta * TO_RADIAN);
-	tiger_rotation_angle = theta;
-
-
-	int tmp;
-	switch((tmp = outOfField())) {
-	case 0:
-		flag = 0;
-		return;
-	case 1:			// x+++++
-		//if (flag) return;
-		theta = rand() % 180 + 90;
-
-		break;
-	case 2:			// x-----
-		//if (flag) return;
-
-		theta = rand() % 90;
-		if (rand() % 2) theta = 360 - theta;
-		break;
-	case 3:			// y+++++
-		//if (flag) return;
-
-		theta = rand() % 180 + 180;
-		break;
-	case 4:			// y-----
-		//if (flag) return;
-
-		theta = rand() % 180;
-		break;
-	}
-
-	printf("\n\n%d\t%.4f %.4f\n", tmp, tiger_pos_x, tiger_pos_y);
-	printf("%d\n\n", theta);
-
-	tiger_pos_x = prev_tiger_pos[0] + tiger_speed * cos(theta * TO_RADIAN);
-	tiger_pos_y = prev_tiger_pos[1] + tiger_speed * sin(theta * TO_RADIAN);
-	flag = 1;
-	tiger_rotation_angle = theta;
-}
+#include "myFunc.h"
 
 void display_camera(int camera_index) {
 
@@ -211,7 +138,6 @@ void display_camera(int camera_index) {
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(70.0f, 70.0f, 70.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
-
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_spider();
 
@@ -222,13 +148,12 @@ void display_camera(int camera_index) {
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, ben_rotation_angle * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
-
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_ben();
 	
 
 	// DRAW COW
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-100.0f, 80.0f, 13.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index],cow_pos);
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(40.0f, 40.0f, 40.0f));
 
@@ -236,20 +161,21 @@ void display_camera(int camera_index) {
 	draw_cow();
 
 
-
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-100.0f, 80.0f, 13.0f));
+	
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(100.0f, 100.0f, 0.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	//draw_circle();
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(-100.0f, 80.0f, 13.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(5.0f, 5.0f, 0.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(14.0f, 14.0f, 14.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_cylinder();
-
-
+	
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glUniform3f(loc_primitive_color, 1.0f, 0.0f, 0.0f); // color name: DarkTurquoise
+	draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL); // draw wheel
 
 
 }
