@@ -90,27 +90,78 @@ int cow_tiger_collision() { //int theta, float tiger_x, float tiger_y) {
 
 glm::vec3 spider_pos = { 82.5f, 0.0f, 100.0f };
 int spider_rotation_angle = 0;
-float spider_speed = 0.5;
+float spider_speed = 0.5f;
+float spider_x_ratio = 5.0f;
+enum _on_brick { first, second, third } on_brick;
+
 void get_spider_pos() {
 	float y_range[2];
+	float brick_range[4] = { 18 - 135.0f / 2 - 90 + 30, 18 - 135.0f / 2, 18 + 135.0f / 2, 18 + 135.0f / 2 + 54 - 10 };
 
 	if (view_brick) {
-		y_range[0] = 18 - 135.0f / 2 - 90;
-		y_range[1] = 18 + 135.0f / 2 + 54;
+		y_range[0] = brick_range[0];
+		y_range[1] = brick_range[3];
 	}
 	else {
-		y_range[0] = 18 - 135.0f / 2;
-		y_range[1] = 18 + 135.0f / 2;
+		if (on_brick == first) {
+			y_range[0] = brick_range[0];
+			y_range[1] = brick_range[1];
+		}
+		else if (on_brick == second) {
+			y_range[0] = brick_range[1];
+			y_range[1] = brick_range[2];
+		}
+		else {
+			y_range[0] = brick_range[2];
+			y_range[1] = brick_range[3];
+		}
 	}
 
 	if (spider_rotation_angle == 0) {
 		spider_pos[1] += spider_speed;
+
+		if (spider_pos[1] <= brick_range[1]) {
+			spider_pos[0] = 202.5f;
+			on_brick = first;
+		}
+		else if (spider_pos[1] <= brick_range[2]) {
+			spider_pos[0] -= spider_x_ratio;
+			if (spider_pos[0] <= 82.5f)
+				spider_pos[0] = 82.5f;
+			on_brick = second;
+		}
+		else {
+			spider_pos[0] += spider_x_ratio;
+			if (spider_pos[0] >= 142.5f)
+				spider_pos[0] = 142.5f;
+			on_brick = third;
+		}
+
 		if (spider_pos[1] + 15 >= y_range[1]) {
 			spider_rotation_angle = 180;
 		}
 	}
 	else {
 		spider_pos[1] -= spider_speed;
+
+		if (spider_pos[1] >= brick_range[2]) {
+			spider_pos[0] = 142.5f;
+			on_brick = third;
+		}
+		else if (spider_pos[1] >= brick_range[1]) {
+			spider_pos[0] -= spider_x_ratio;
+			if (spider_pos[0] <= 82.5f)
+				spider_pos[0] = 82.5f;
+			on_brick = second;
+		}
+		else {
+			spider_pos[0] += spider_x_ratio;
+			if (spider_pos[0] >= 202.5f)
+				spider_pos[0] = 202.5f;
+
+			on_brick = first;
+		}
+
 		if (spider_pos[1] - 15 <= y_range[0])
 			spider_rotation_angle = 0;
 	}
