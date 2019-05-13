@@ -133,7 +133,7 @@ void display_camera(int camera_index) {
 
 
 	// DRAW SPIDER
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(90.0f, 0.0f, 100.0f));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(82.5f, 0.0f, 100.0f));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(20.0f, 20.0f, 20.0f));
 	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -200,7 +200,7 @@ void display_camera(int camera_index) {
 	// DRAW ROCKS
 	float y = (11 + 20) / 17.0f;
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(200, -80 - 20, 100));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(202.5, -80, 100));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -208,14 +208,14 @@ void display_camera(int camera_index) {
 	draw_obj1();
 	
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(70, 0 - 20, 100));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(82.5, 0, 100));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj2();
 
 
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 120 - 20, 100));
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 120, 100));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.0f, 4.0f, 4.0f));
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
