@@ -25,6 +25,8 @@ glm::mat4 ModelViewProjectionMatrix; // This one is sent to vertex shader when i
 glm::mat4 ModelMatrix_CAR_BODY, ModelMatrix_CAR_WHEEL, ModelMatrix_CAR_NUT, ModelMatrix_CAR_DRIVER;
 glm::mat4 ModelMatrix_CAR_BODY_to_DRIVER; // computed only once in initialize_camera()
 
+glm::mat4 ModelMatrix_TIGER, ModelMatrix_TIGER_PERS;
+
 #include "camera.h"
 int flag_polygon_fill = 0;
 
@@ -104,9 +106,9 @@ void display_camera(int camera_index) {
 
 
 	//ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(142.5f, 113.0f, 3.0f));
-	if (car_left_flag)
+	if (car_left_flag) 
 		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f + 142.5f, car_pos_y * 113.0f, 15.0f));
-	else
+	else 
 		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f - 142.5f, car_pos_y * 113.0f, 15.0f));
 	ModelMatrix_CAR_BODY = glm::scale(ModelMatrix_CAR_BODY, glm::vec3(3.0f, 3.0f, 3.0f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, (car_rotation_angle + 90.0f) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -120,11 +122,14 @@ void display_camera(int camera_index) {
 	draw_car_dummy();
 	
 	// DRAW TIGER
-	ModelViewProjectionMatrix = glm::rotate(ViewProjectionMatrix[camera_index], 90 * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, glm::vec3(-100.0f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(0.35f, 0.35f, 0.35f));
+	ModelMatrix_TIGER = glm::rotate(glm::mat4(1.0f), 90 * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix_TIGER = glm::translate(ModelMatrix_TIGER, glm::vec3(-100.0f, 0.0f, 0.0f));
+	ModelMatrix_TIGER = glm::rotate(ModelMatrix_TIGER, -90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix_TIGER = glm::scale(ModelMatrix_TIGER, glm::vec3(0.30f, 0.30f, 0.30f));
 
+	if (view_mode == TIGER_PERS) set_ViewMatrix_for_TIGER_PERS();
+
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_TIGER;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_tiger();
 
@@ -340,15 +345,13 @@ void mousePressed(int button, int state, int x, int y) {
 	if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)) {
 		prevx = x, prevy = y;
 		leftbutton_pressed = 1;
-		//glutPostRedisplay();
 	}
-	else if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_UP)) {
+	else if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_UP)) 
 		leftbutton_pressed = 0;
-		//glutPostRedisplay();
-	}
+	
 }
 
-#define CAM_ROT_SENSITIVITY		0.50f
+#define CAM_ROT_SENSITIVITY		0.80f
 #define CAM_ZOOM_STEP			0.03f
 #define CAM_MAX_ZOOM_IN_FACTOR	0.10f
 #define CAM_MAX_ZOOM_OUT_FACTOR	2.50f
@@ -422,11 +425,18 @@ void keyboard(unsigned char key, int x, int y) {
 		set_ViewMatrix_for_world_viewer();
 		view_mode = VIEW_WORLD;
 		break;
-	case 'c':	// CAR DRIVER PERSPECTIVE
+	case 'd':	// CAR DRIVER PERSPECTIVE
 		view_mode = DRIVER_PERS;
 		break;
 	case 't':	// TIGER PERSPECTIVE
 		view_mode = TIGER_PERS;
+		break;
+	case 'c':	// VIEW CAR
+		set_ViewMatrix_for_CAR(car_left_flag, car_pos_x, car_pos_y);
+		view_mode = VIEW_CAR;
+		glutPostRedisplay();
+
+		break;
 	case 'p':
 		flag_polygon_fill = 1 - flag_polygon_fill;
 		if (flag_polygon_fill)
@@ -452,17 +462,24 @@ void special(int key, int x, int y) {
 
 	switch (key) {
 	case GLUT_KEY_UP:
-		tmp = glm::rotate(glm::mat4(1.0f), -CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+		tmp = glm::rotate(tmp, -CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+		tmp = glm::translate(tmp, -camera[0].vrp);
 		break;
 	case GLUT_KEY_DOWN:
-		tmp = glm::rotate(glm::mat4(1.0f), CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+		tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+		tmp = glm::translate(tmp, -camera[0].vrp);
 		break;
 	case GLUT_KEY_LEFT:
-		tmp = glm::rotate(glm::mat4(1.0f), -CAM_ROT_SENSITIVITY * TO_RADIAN, v);
+		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+		tmp = glm::rotate(tmp, -CAM_ROT_SENSITIVITY * TO_RADIAN, v);
+		tmp = glm::translate(tmp, -camera[0].vrp);
 		break;
 	case GLUT_KEY_RIGHT:
-		tmp = glm::rotate(glm::mat4(1.0f), CAM_ROT_SENSITIVITY * TO_RADIAN, v);
-		break;
+		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+		tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, v);
+		tmp = glm::translate(tmp, -camera[0].vrp);		break;
 	}
 
 	camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));

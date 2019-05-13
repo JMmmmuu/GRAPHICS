@@ -56,8 +56,11 @@ void initialize_OpenGL() {
 
 	// the transformation that moves the driver's camera frame from car body's MC to driver seat
 	ModelMatrix_CAR_BODY_to_DRIVER = glm::translate(glm::mat4(1.0f), glm::vec3(-3.0f, 0.5f, 2.5f));
-	ModelMatrix_CAR_BODY_to_DRIVER = glm::rotate(ModelMatrix_CAR_BODY_to_DRIVER,
-		TO_RADIAN*90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelMatrix_CAR_BODY_to_DRIVER = glm::rotate(ModelMatrix_CAR_BODY_to_DRIVER, TO_RADIAN*90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	ModelMatrix_TIGER_PERS = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -88.0f, 62.0f));
+	ModelMatrix_TIGER_PERS = glm::rotate(ModelMatrix_TIGER_PERS, 90.0f * TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelMatrix_TIGER_PERS = glm::rotate(ModelMatrix_TIGER_PERS, 180.0f * TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glClearColor(0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
