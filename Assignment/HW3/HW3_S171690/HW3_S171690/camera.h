@@ -77,13 +77,45 @@ void set_ViewMatrix_for_TIGER(float tiger_pos_x, float tiger_pos_y) {
 }
 
 int view_brick = 0;
+int cam_moving = 0;
+glm::vec3 cam_dif[3];
+glm::vec3 cam_target[3];
+
 void set_Cam_to_Brick() {
 	set_ViewMatrix_for_world_viewer();
+	glm::vec3 brick_vrp = cam_target[0] = glm::vec3(82.5f, 20.0f, 100.0f);
+	glm::vec3 brick_prp = cam_target[1] = glm::vec3(500.0f, 20.0f, 100.0f);
+	glm::vec3 brick_vup = cam_target[2] = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	camera[0].vrp = glm::vec3(82.5f, 20.0f, 100.0f);
+	cam_moving = 1;
+	cam_dif[0] = brick_vrp - camera[0].vrp;
+	cam_dif[1] = brick_prp - camera[0].prp;
+	cam_dif[2] = brick_vup - camera[0].vup;
+
+	/*camera[0].vrp = glm::vec3(82.5f, 20.0f, 100.0f);
 	camera[0].prp = glm::vec3(500.0f, 20.0f, 100.0f);
-	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);
+	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);*/
+	/*
+	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
+	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];*/
+}
 
+#define MOVING_CAM_SCENE 30.0f
+void moveCam() {
+	camera[0].vrp += cam_dif[0] / MOVING_CAM_SCENE;
+	camera[0].prp += cam_dif[1] / MOVING_CAM_SCENE;
+	camera[0].vup += cam_dif[2] / MOVING_CAM_SCENE;
+
+	if (camera[0].vrp[0] >= cam_target[0][0]) {
+		camera[0].vrp = cam_target[0];
+		//if (camera[0].prp[0] >= cam_target[1][0])
+		camera[0].vrp = cam_target[1];
+		//if (camera[0].vup[0] >= cam_target[1][0])
+		camera[0].vrp = cam_target[2];
+		cam_moving = 0;
+	}
+	
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
