@@ -166,3 +166,26 @@ void get_spider_pos() {
 			spider_rotation_angle = 0;
 	}
 }
+
+glm::vec3 ironman_pos = { -142.5 + 40, -70.0f, 30.0f };
+int ironman_rotation_angle = 0;
+int ironman_fly = 0;
+int IRONMAN_ROT_SPEED = 5;
+#define IRONMAN_HEIGHT 3
+
+void get_ironman_pos() {
+	if (ironman_fly) {
+		// go higher
+		ironman_pos[2] += IRONMAN_HEIGHT;
+		IRONMAN_ROT_SPEED = 15;
+		ironman_rotation_angle = (ironman_rotation_angle + IRONMAN_ROT_SPEED) % 360;
+	}
+	else {
+		ironman_pos[2] -= IRONMAN_HEIGHT;
+		IRONMAN_ROT_SPEED = 5;
+		ironman_rotation_angle = (ironman_rotation_angle + IRONMAN_ROT_SPEED) % 360;
+
+		if (ironman_pos[2] <= 30)
+			ironman_pos[2] = 30.0f;
+	}
+}

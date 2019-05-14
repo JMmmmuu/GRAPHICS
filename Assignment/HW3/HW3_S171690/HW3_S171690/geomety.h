@@ -347,6 +347,11 @@ int ben_vertex_offset[N_BEN_FRAMES];
 GLfloat *ben_vertices[N_BEN_FRAMES];
 int cur_frame_ben = 0;
 
+// ironman object
+GLuint ironman_VBO, ironman_VAO;
+int ironman_n_triangles;
+GLfloat *ironman_vertices;
+
 
 int read_geometry(GLfloat **object, int bytes_per_primitive, char *filename) {
 	int n_triangles;
@@ -372,7 +377,6 @@ int read_geometry(GLfloat **object, int bytes_per_primitive, char *filename) {
 
 	return n_triangles;
 }
-
 
 void prepare_tiger(void) { // vertices enumerated clockwise
 	int i, n_bytes_per_vertex, n_bytes_per_triangle, tiger_n_total_triangles = 0;
@@ -554,7 +558,43 @@ void prepare_ben(void) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
+void prepare_ironman(void) {
+	int i, n_bytes_per_vertex, n_bytes_per_triangle, ironman_n_total_triangles = 0;
+	char filename[512];
 
+	n_bytes_per_vertex = 8 * sizeof(float); // 3 for vertex, 3 for normal, and 2 for texcoord
+	n_bytes_per_triangle = 3 * n_bytes_per_vertex;
+
+	sprintf(filename, "Data/static_objects/ironman_vnt.geom");
+	ironman_n_triangles = read_geometry(&ironman_vertices, n_bytes_per_triangle, filename);
+	// assume all geometry files are effective
+	ironman_n_total_triangles += ironman_n_triangles;
+
+
+	// initialize vertex buffer object
+	glGenBuffers(1, &ironman_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, ironman_VBO);
+	glBufferData(GL_ARRAY_BUFFER, ironman_n_total_triangles * 3 * n_bytes_per_vertex, ironman_vertices, GL_STATIC_DRAW);
+
+	// as the geometry data exists now in graphics memory, ...
+	free(ironman_vertices);
+
+	// initialize vertex array object
+	glGenVertexArrays(1, &ironman_VAO);
+	glBindVertexArray(ironman_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, ironman_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
 
 
 void draw_tiger(void) {
@@ -583,6 +623,13 @@ void draw_ben(void) {
 
 	glBindVertexArray(ben_VAO);
 	glDrawArrays(GL_TRIANGLES, ben_vertex_offset[cur_frame_ben], 3 * ben_n_triangles[cur_frame_ben]);
+	glBindVertexArray(0);
+}
+void draw_ironman(void) {
+	glFrontFace(GL_CW);
+
+	glBindVertexArray(ironman_VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * ironman_n_triangles);
 	glBindVertexArray(0);
 }
 

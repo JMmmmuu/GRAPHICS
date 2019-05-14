@@ -197,6 +197,15 @@ void display_camera(int camera_index) {
 		draw_cow();
 	}
 
+	// DRAW IRONMAN
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], ironman_pos);
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(10.0f, 10.0f, 10.0f));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, ironman_rotation_angle * TO_RADIAN, glm::vec3(0, 0, 1));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(1, 0, 0));
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_ironman();
+
 
 	// DRAW BRICKS
 	float y = (11 + 20) / 17.0f;
@@ -225,6 +234,9 @@ void display_camera(int camera_index) {
 
 
 
+
+
+
 }
 
 void display() {
@@ -233,7 +245,6 @@ void display() {
 	display_camera(0);
 	//display_camera(1);
 	glutSwapBuffers();
-
 }
 
 void timer_scene(int value) {
@@ -328,18 +339,17 @@ void timer_scene(int value) {
 			del_pos = 1;
 		}
 	}
-	//printf("\t\t%d %f %f %f\n", car_idx, car_pos_x, car_pos_y, car_rotation_angle);
 
 	float ra = 3.0f;
 	rotation_angle_wheel += 5;// (del_pos / ra) * 2;
 	if (rotation_angle_wheel >= 360) rotation_angle_wheel -= 360;
-	//printf("%f\t%f\n", del_pos, rotation_angle_wheel);
 
+	// TIGER
 	cur_frame_tiger = (value / 3) % N_TIGER_FRAMES;
 	cur_frame_ben = value % N_BEN_FRAMES;
 	cur_frame_spider = (value / 3) % N_SPIDER_FRAMES;
 
-
+	//  BEN
 	static int ben_idx = 1, ben_tmp = 1;
 	float ben_speed = 0.03f;
 	if (ben_idx == 91) {
@@ -377,8 +387,13 @@ void timer_scene(int value) {
 		ben_idx += 3;
 	}
 
+	// SPIDER
 	get_spider_pos();
 
+	// IRONMAN
+	get_ironman_pos();
+
+	// BRICK
 	if (cam_moving)
 		moveCam();
 	
@@ -491,7 +506,6 @@ void motion(int x, int y) {
 	}*/
 }
 
-
 void keyboard(unsigned char key, int x, int y) {
 	view_brick = 0;
 	switch (key) {
@@ -524,7 +538,9 @@ void keyboard(unsigned char key, int x, int y) {
 		view_brick = 1;
 		break;
 
-
+	case 'i':
+		ironman_fly = 1 - ironman_fly;
+		break;
 	case 'r':
 		reset_CAM();
 		break;
