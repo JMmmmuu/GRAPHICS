@@ -379,10 +379,9 @@ void timer_scene(int value) {
 
 	get_spider_pos();
 
-	if (cam_moving) {
+	if (cam_moving)
 		moveCam();
-
-	}
+	
 
 	glutPostRedisplay();
 	glutTimerFunc(10, timer_scene, (value + 1) % INT_MAX);
