@@ -31,6 +31,7 @@ void getTigerPos() {
 	const float tiger_speed = 1;
 	static glm::vec3 prev_tiger_pos;
 	static int theta = rand() % 360;
+	static int prev_theta = theta;
 
 	prev_tiger_pos[0] = tiger_pos_x;
 	prev_tiger_pos[1] = tiger_pos_y;
@@ -49,22 +50,33 @@ void getTigerPos() {
 	case 0:
 		return;
 	case 1:			// x+++++
-		theta = rand() % 180 + 90;
+		if (theta < 90)
+			theta = rand() % 90 + 90;
+		else
+			theta = rand() % 90 + 180;
 		break;
 	case 2:			// x-----
-		theta = rand() % 90;
-		if (rand() % 2) theta = 360 - theta;
+		if (theta < 180)
+			theta = rand() % 90;
+		else 
+			theta = 360 - rand() % 90;
 		break;
 	case 3:			// y+++++
-		theta = rand() % 180 + 180;
+		if (theta < 90)
+			theta = rand() % 90 + 270;
+		else
+			theta = rand() % 90 + 180;
 		break;
 	case 4:			// y-----
-		theta = rand() % 180;
+		if (theta < 270)
+			theta = rand() % 90 + 90;
+		else
+			theta = rand() % 90;
 		break;
 	}
 
-	//printf("\n\n%d\t%.4f %.4f\n", tmp, tiger_pos_x, tiger_pos_y);
-	//printf("%d\n\n", theta);
+	printf("\n\n%d\t%.4f %.4f\n", tmp, tiger_pos_x, tiger_pos_y);
+	printf("%d\n\n", theta);
 
 	tiger_pos_x = prev_tiger_pos[0] + tiger_speed * cos(theta * TO_RADIAN);
 	tiger_pos_y = prev_tiger_pos[1] + tiger_speed * sin(theta * TO_RADIAN);
@@ -88,7 +100,6 @@ int cow_tiger_collision() { //int theta, float tiger_x, float tiger_y) {
 		return 1;
 	}
 	else {
-
 		return 0;
 	}
 }
