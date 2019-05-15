@@ -729,7 +729,7 @@ void free_geom_obj(int geom_obj_ID) {
 float rad = 1.7f;
 float ww = 1.0f;
 float rotation_angle_wheel = 0.0f;
-float rotation_angle_vert_wheel = 30.0f;
+float rotation_angle_vert_wheel = 0.0f;
 
 void draw_wheel_and_nut() {
 	// angle is used in Hierarchical_Car_Correct later
@@ -772,10 +772,10 @@ void draw_car_dummy(void) {
 	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_wheel_and_nut();  // draw wheel 0
+	draw_wheel_and_nut();  // draw wheel 0/	front
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, 4.5f));
-	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * TO_RADIAN, glm::vec3(0, 1, 0));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * 0.7f * TO_RADIAN, glm::vec3(0, 1, 0));
 	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
@@ -787,10 +787,10 @@ void draw_car_dummy(void) {
 	ModelMatrix_CAR_WHEEL = glm::scale(ModelMatrix_CAR_WHEEL, glm::vec3(1.0f, 1.0f, -1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_wheel_and_nut();  // draw wheel 2
+	draw_wheel_and_nut();  // draw wheel 2/ front
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, -4.5f));
-	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * TO_RADIAN, glm::vec3(0, 1, 0));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * 0.7f * TO_RADIAN, glm::vec3(0, 1, 0));
 	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelMatrix_CAR_WHEEL = glm::scale(ModelMatrix_CAR_WHEEL, glm::vec3(1.0f, 1.0f, -1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;

@@ -234,13 +234,12 @@ void display() {
 	glutSwapBuffers();
 }
 
-void timer_scene(int value) {
-
+void car_timer(int value) {
 	// CAR
 	static int car_idx = 1;
 	static int tmp = 1;
-	float car_speed = 0.01f;
 	float del_pos;
+	float car_speed = 0.01f;
 
 	if (car_left_flag) {
 		if (car_idx == 91) {
@@ -276,12 +275,18 @@ void timer_scene(int value) {
 				tmp = 1;
 			}
 		}
-		else {
+		else {	// corner
 			car_pos_x = partial_vertices[car_idx][0];
 			car_pos_y = partial_vertices[car_idx][1];
 			car_rotation_angle = (car_idx - tmp + 180) % 360;
 			car_idx++;
 			del_pos = 1;
+
+			rotation_angle_vert_wheel = (int)car_rotation_angle % 90;
+			if (rotation_angle_vert_wheel >= 45)
+				rotation_angle_vert_wheel = 90 - rotation_angle_vert_wheel;
+
+			rotation_angle_vert_wheel *= 0.8f;
 		}
 	}
 	else {
@@ -324,14 +329,22 @@ void timer_scene(int value) {
 			car_rotation_angle = (car_idx - tmp) % 360;
 			car_idx--;
 			del_pos = 1;
+
+			rotation_angle_vert_wheel = (int)car_rotation_angle % 90;
+			if (rotation_angle_vert_wheel >= 45)
+				rotation_angle_vert_wheel = 90 - rotation_angle_vert_wheel;
+			rotation_angle_vert_wheel *= -0.9f;
 		}
 	}
 
 	float ra = 6.0f;
 	rotation_angle_wheel += (del_pos / ra) * TO_DEGREE;
 	if (rotation_angle_wheel >= 360) rotation_angle_wheel -= 360;
-	printf("%f\t%f\t%f\t%f\n", car_pos_x, car_pos_y, del_pos, rotation_angle_wheel);
 
+	glutPostRedisplay();
+	glutTimerFunc(car_timer_scene, car_timer, (value + 1) % INT_MAX);
+}
+void timer_scene(int value) {
 	// TIGER
 	cur_frame_tiger = (value / 3) % N_TIGER_FRAMES;
 	cur_frame_ben = value % N_BEN_FRAMES;
@@ -469,17 +482,6 @@ void motion(int x, int y) {
 		}
 	}
 
-	/*if (view_mode == VIEW_FIELD) {
-		if (glutGetModifiers() == GLUT_ACTIVE_CTRL && leftbutton_pressed) {
-
-		}
-
-
-
-
-
-
-	}*/
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -524,6 +526,23 @@ void keyboard(unsigned char key, int x, int y) {
 		reset_CAM();
 		view_mode = VIEW_WORLD;
 		break;
+
+	case 'm':
+		car_timer_scene *= (8.0f / 10);
+		printf("%f\n", car_timer_scene);
+
+		if (car_timer_scene < MIN_CAR_TIME)
+			car_timer_scene = MIN_CAR_TIME;
+		printf("%f\n", car_timer_scene);
+		break;
+	case 'n':
+		car_timer_scene *= (12.0f / 10);
+		if (car_timer_scene > MAX_CAR_TIME)
+			car_timer_scene = MAX_CAR_TIME;
+		printf("%f\n", car_timer_scene);
+		break;
+
+
 	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
 		if (flag_polygon_fill)
@@ -736,6 +755,7 @@ void register_callbacks(void) {
 	glutSpecialFunc(special);
 	glutMotionFunc(motion);
 	glutReshapeFunc(reshape);
+	glutTimerFunc(100, car_timer, 0);
 	glutTimerFunc(100, timer_scene, 0);
 	glutTimerFunc(1, timer_scene_2, 0);
 	glutCloseFunc(cleanup);

@@ -1,4 +1,7 @@
-float car_pos_x, car_pos_y, car_rotation_angle;
+#define MAX_CAR_TIME 25
+#define MIN_CAR_TIME 1
+
+float car_pos_x, car_pos_y, car_rotation_angle, car_timer_scene = 10.0f;
 int car_left_flag = 1;
 
 float tiger_pos_x = -100.0f, tiger_pos_y = 30.0f;
