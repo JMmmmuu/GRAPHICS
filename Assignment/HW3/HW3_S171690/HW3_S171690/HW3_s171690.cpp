@@ -418,6 +418,8 @@ void timer_scene_2(int value) {
 	float tmp;
 	static int flag = 0;
 
+	float blk_size = y * 113.0f / 3;
+
 	if (cow_tiger_collide) {
 		if (!flag) {
 			flag = 1;
@@ -426,8 +428,21 @@ void timer_scene_2(int value) {
 			sign = rand() % 2 ? 1 : -1;
 			cow_pos[0] = -142.5f + (rand() % 90) * sign;
 
-			sign = rand() % 2 ? 1 : -1;
-			cow_pos[1] = y * (rand() % 80) * sign;
+			if (cow_pos[1] < -blk_size / 2) {
+				cow_pos[1] = -blk_size / 2 + (rand() % (int)blk_size) * 2;
+			}
+			else if (cow_pos[1] < blk_size / 2) {
+				sign = rand() % 2 ? 1 : -1;
+				cow_pos[1] = (sign == 1) ? -(y * 113.0f / 2) : blk_size;
+				cow_pos[1] += (rand() % (int)blk_size);
+			}
+			else {
+				cow_pos[1] = -(y * 113.0f / 2) + (rand() % (int)blk_size * 2);
+			}
+
+
+			//sign = rand() % 2 ? 1 : -1;
+			//cow_pos[1] = y * (rand() % 80) * sign;
 		}
 
 		cylinder_z_1 += 0.1;
