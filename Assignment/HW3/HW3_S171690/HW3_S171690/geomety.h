@@ -855,7 +855,7 @@ void prepare_obj1() {
 void draw_obj1(void) {
 	glFrontFace(GL_CCW);
 
-	GLfloat color[3] = { 226.0f / 255, 226.0f / 255, 226.0f / 255 };
+	GLfloat color[3] = { 158.0f / 255, 87.0f / 255, 1.0f / 255 };
 	glBindVertexArray(obj1_VAO);
 	glUniform3fv(loc_primitive_color, 1, color);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
@@ -921,7 +921,7 @@ void prepare_obj2() {
 void draw_obj2(void) {
 	glFrontFace(GL_CCW);
 
-	GLfloat color[3] = { 226.0f / 255, 226.0f / 255, 226.0f / 255 };
+	GLfloat color[3] = { 142.0f / 255, 111.0f / 255, 77.0f / 255 };
 	glBindVertexArray(obj2_VAO);
 	glUniform3fv(loc_primitive_color, 1, color);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
@@ -983,7 +983,7 @@ void prepare_obj3() {
 void draw_obj3(void) {
 	glFrontFace(GL_CCW);
 
-	GLfloat color[3] = { 226.0f / 255, 226.0f / 255, 226.0f / 255 };
+	GLfloat color[3] = { 158.0f / 255, 66.0f / 255, 9.0f / 255 };
 	glBindVertexArray(obj3_VAO);
 	glUniform3fv(loc_primitive_color, 1, color);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
