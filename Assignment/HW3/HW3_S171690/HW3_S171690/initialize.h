@@ -73,7 +73,7 @@ void prepare_scene() {
 	prepare_axes();
 	prepare_points();
 	prepare_circle();
-	prepare_cylinder();
+	//prepare_cylinder();
 
 	prepare_obj1();
 	prepare_obj2();

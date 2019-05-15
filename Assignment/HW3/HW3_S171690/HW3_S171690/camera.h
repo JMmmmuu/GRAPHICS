@@ -85,7 +85,7 @@ CAMERA target_cam;
 void set_Cam_to_Brick() {
 	set_ViewMatrix_for_world_viewer();
 	target_cam.vrp = glm::vec3(82.5f, 20.0f, 100.0f);
-	target_cam.prp = glm::vec3(500.0f, 20.0f, 100.0f);
+	target_cam.prp = glm::vec3(600.0f, 20.0f, 100.0f);
 	target_cam.vup = glm::vec3(0.0f, 0.0f, 1.0f);
 	target_cam.fov_y = 45.0f;
 	target_cam.aspect_ratio = 1.0f;
@@ -123,7 +123,7 @@ void moveCam() {
 	camera[0].near_clip += cam_dif.near_clip / MOVING_CAM_SCENE;
 	camera[0].zoom_factor += cam_dif.zoom_factor / MOVING_CAM_SCENE;
 
-	if (camera[0].vrp[0] >= target_cam.vrp[0]) {
+	if (camera[0].prp[0] >= target_cam.prp[0]) {
 		camera[0].vrp = target_cam.vrp;
 		camera[0].prp = target_cam.prp;
 		camera[0].vup = target_cam.vup;

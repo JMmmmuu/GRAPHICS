@@ -393,6 +393,7 @@ void timer_scene(int value) {
 	// IRONMAN
 	get_ironman_pos();
 
+		
 	// BRICK
 	if (cam_moving)
 		moveCam();
@@ -479,31 +480,6 @@ void motion(int x, int y) {
 			glutPostRedisplay();
 		}
 	}
-	/*
-	if (leftbutton_pressed) {
-		delx = (float)(x - prevx), dely = -(float)(y - prevy);
-		prevx = x, prevy = y;
-
-		mat4_tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
-		mat4_tmp = glm::rotate(mat4_tmp, CAM_ROT_SENSITIVITY*delx*TO_RADIAN, glm::vec3(0.0f, 1.0f, 0.0f));
-		mat4_tmp = glm::translate(mat4_tmp, -camera[0].vrp);
-
-		camera[0].prp = glm::vec3(mat4_tmp*glm::vec4(camera[0].prp, 1.0f));
-		camera[0].vup = glm::vec3(mat4_tmp*glm::vec4(camera[0].vup, 0.0f));
-
-		vec3_tmp = glm::cross(camera[0].vup, camera[0].vrp - camera[0].prp);
-		mat4_tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
-		mat4_tmp = glm::rotate(mat4_tmp, CAM_ROT_SENSITIVITY*dely*TO_RADIAN, vec3_tmp);
-		mat4_tmp = glm::translate(mat4_tmp, -camera[0].vrp);
-
-		camera[0].prp = glm::vec3(mat4_tmp*glm::vec4(camera[0].prp, 1.0f));
-		camera[0].vup = glm::vec3(mat4_tmp*glm::vec4(camera[0].vup, 0.0f));
-
-		ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
-
-		ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-		glutPostRedisplay();
-	}*/
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -516,35 +492,34 @@ void keyboard(unsigned char key, int x, int y) {
 			glUseProgram(0);
 			glutPostRedisplay();
 			break;*/
-	case 'w':
+	/*case 'w':
 		set_ViewMatrix_for_world_viewer();
 		view_mode = VIEW_WORLD;
-		break;
-	case 'd':	// CAR DRIVER PERSPECTIVE
+		break;*/
+	case 'd':		// CAR DRIVER PERSPECTIVE
 		view_mode = DRIVER_PERS;
 		break;
-	case 't':	// TIGER PERSPECTIVE
+	case 't':		// TIGER PERSPECTIVE
 		view_mode = TIGER_PERS;
 		break;
-	case 'c':	// VIEW CAR
+	case 'c':		// VIEW CAR
 		set_ViewMatrix_for_world_viewer();
 		view_mode = VIEW_CAR;
 
 		break;
-
-	case 'b':
+	case 'b':		// VIEW SPIDER on the BRICK
 		set_Cam_to_Brick();
 		view_mode = VIEW_BRICK;
 		view_brick = 1;
-		break;
 
+		break;
 	case 'i':
 		ironman_fly = 1 - ironman_fly;
 		break;
-	case 'r':
+	case 'r':		// RESET CAMERA
 		reset_CAM();
 		break;
-	case 'p':
+	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
 		if (flag_polygon_fill)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -552,7 +527,7 @@ void keyboard(unsigned char key, int x, int y) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glutPostRedisplay();
 		break;
-	case 27: // ESC key
+	case 27:		// ESC key
 		glutLeaveMainLoop();
 		break;
 	}
@@ -587,7 +562,15 @@ void special(int key, int x, int y) {
 	case GLUT_KEY_RIGHT:
 		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
 		tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, v);
-		tmp = glm::translate(tmp, -camera[0].vrp);		break;
+		tmp = glm::translate(tmp, -camera[0].vrp);
+		break;
+
+	/*case GLUT_KEY_ALT_L:
+		if (glutGetModifiers() && GLUT_ACTIVE_ALT)
+			ironman_fly = 1;
+		else
+			ironman_fly = 0;*/
+	
 	}
 
 	camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
@@ -595,7 +578,6 @@ void special(int key, int x, int y) {
 
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 
 	glutPostRedisplay();
 }
@@ -606,7 +588,6 @@ void reshape(int width, int height) {
 	viewport[0].w = (int)(width); viewport[0].h = (int)(height);
 	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio,camera[0].near_clip, camera[0].far_clip);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-	//ViewProjectionMatrix[0] = glm::rotate(ViewProjectionMatrix[0], 120 * TO_RADIAN, glm::vec3(-1, -1, -1));
 
 	camera[1].aspect_ratio = camera[0].aspect_ratio; // for the time being ...
 	viewport[1].x = (int)(0.75f*width); viewport[1].y = (int)(0.75f*height);
@@ -636,11 +617,14 @@ void cleanup(void) {
 	glDeleteVertexArrays(1, &plane_VAO);
 	glDeleteBuffers(1, &plane_VBO);
 
-	glDeleteVertexArrays(1, &cylinder_VAO);
-	glDeleteBuffers(1, &cylinder_VBO);
+	/*glDeleteVertexArrays(1, &cylinder_VAO);
+	glDeleteBuffers(1, &cylinder_VBO);*/
 	
 	glDeleteVertexArrays(1, &cow_VAO);
 	glDeleteBuffers(1, &cow_VBO);
+
+	glDeleteVertexArrays(1, &circle_VAO);
+	glDeleteBuffers(1, &circle_VBO);
 
 	glDeleteVertexArrays(1, &tiger_VAO);
 	glDeleteBuffers(1, &tiger_VBO);
@@ -651,10 +635,19 @@ void cleanup(void) {
 	glDeleteVertexArrays(1, &ben_VAO);
 	glDeleteBuffers(1, &ben_VBO);
 
+	glDeleteVertexArrays(1, &ironman_VAO);
+	glDeleteBuffers(1, &ironman_VBO);
+
 	free_geom_obj(GEOM_OBJ_ID_CAR_BODY);
 	free_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
 	free_geom_obj(GEOM_OBJ_ID_CAR_NUT);
 
+	glDeleteVertexArrays(1, &obj1_VAO);
+	glDeleteBuffers(1, &obj1_VBO);
+	glDeleteVertexArrays(1, &obj2_VAO);
+	glDeleteBuffers(1, &obj2_VBO);
+	glDeleteVertexArrays(1, &obj3_VAO);
+	glDeleteBuffers(1, &obj3_VBO);
 }
 
 void register_callbacks(void) {

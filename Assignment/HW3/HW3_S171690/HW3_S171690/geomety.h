@@ -259,7 +259,7 @@ void draw_circle() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
-GLuint cylinder_VBO, cylinder_VAO;
+/*GLuint cylinder_VBO, cylinder_VAO;
 GLfloat cylinder_vertices[722][8];
 
 void prepare_cylinder() {
@@ -314,7 +314,7 @@ void draw_cylinder() {
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 722);
 	glBindVertexArray(0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-}
+}*/
 
 
 
