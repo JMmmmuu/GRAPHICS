@@ -455,7 +455,7 @@ void mousePressed(int button, int state, int x, int y) {
 void motion(int x, int y) {
 	view_brick = 0;
 
-	if (!(view_mode == VIEW_WORLD || view_mode == VIEW_CAR || view_mode == VIEW_TIGER)) return;
+	//if (!(view_mode == VIEW_WORLD || view_mode == VIEW_CAR || view_mode == VIEW_TIGER)) return;
 
 	glm::mat4 mat4_tmp;
 	glm::vec3 vec3_tmp;
@@ -480,6 +480,8 @@ void motion(int x, int y) {
 			glutPostRedisplay();
 		}
 	}
+
+	
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -492,10 +494,10 @@ void keyboard(unsigned char key, int x, int y) {
 			glUseProgram(0);
 			glutPostRedisplay();
 			break;*/
-	/*case 'w':
+	case 'w':
 		set_ViewMatrix_for_world_viewer();
 		view_mode = VIEW_WORLD;
-		break;*/
+		break;
 	case 'd':		// CAR DRIVER PERSPECTIVE
 		view_mode = DRIVER_PERS;
 		break;
@@ -513,11 +515,17 @@ void keyboard(unsigned char key, int x, int y) {
 		view_brick = 1;
 
 		break;
+	case 'l':
+		set_Cam_to_VIEW_FIELD();
+		printf("%d\n", cam_moving);
+		view_mode = VIEW_FIELD;
+		break;
 	case 'i':
 		ironman_fly = 1 - ironman_fly;
 		break;
 	case 'r':		// RESET CAMERA
 		reset_CAM();
+		view_mode = VIEW_WORLD;
 		break;
 	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
