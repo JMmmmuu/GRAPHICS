@@ -104,8 +104,8 @@ void set_Cam_to_Brick() {
 
 void set_Cam_to_VIEW_FIELD() {
 	//set_ViewMatrix_for_world_viewer();
-	target_cam.vrp = glm::vec3(-142.5f, 0.0f, 0.0f);
-	target_cam.prp = glm::vec3(-400.0f, 400.0f, 400.0f);
+	target_cam.vrp = glm::vec3(-142.5f, 0.0f, 15.0f);
+	target_cam.prp = glm::vec3(-400.0f, 400.0f, 15.0f);
 	target_cam.vup = glm::vec3(0.0f, 0.0f, 1.0f);
 	target_cam.fov_y = 45.0f;
 	target_cam.aspect_ratio = 1.0f;
@@ -157,6 +157,11 @@ void moveCam() {
 	}
 	
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+	//if (view_mode == VIEW_FIELD) {
+		//ViewMatrix[0][2][0] = 0;
+		//ViewMatrix[0][2][1] = 0;
+		//ViewMatrix[0][2][2] = 1;
+	//}
 	ProjectionMatrix[0] = glm::perspective(camera[0].zoom_factor * camera[0].fov_y*TO_RADIAN, camera[0].aspect_ratio, camera[0].near_clip, camera[0].far_clip);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
 

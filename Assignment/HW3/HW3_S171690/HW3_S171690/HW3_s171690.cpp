@@ -481,7 +481,17 @@ void motion(int x, int y) {
 		}
 	}
 
-	
+	if (view_mode == VIEW_FIELD) {
+		if (glutGetModifiers() == GLUT_ACTIVE_CTRL && leftbutton_pressed) {
+
+		}
+
+
+
+
+
+
+	}
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -517,7 +527,6 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'l':
 		set_Cam_to_VIEW_FIELD();
-		printf("%d\n", cam_moving);
 		view_mode = VIEW_FIELD;
 		break;
 	case 'i':
@@ -541,9 +550,11 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 }
 
+#define SUB_CAM_MOVING_SCENE 15
 void special(int key, int x, int y) {
 	view_brick = 0;
-	if (view_mode == DRIVER_PERS) return;
+
+	if (view_mode == DRIVER_PERS || view_mode == TIGER_PERS) return;
 	glm::vec3 n, u, v;
 	glm::mat4 tmp;
 
@@ -551,38 +562,111 @@ void special(int key, int x, int y) {
 	u = cross(camera[0].vup, n);
 	v = cross(n, u);
 
-	switch (key) {
-	case GLUT_KEY_UP:
-		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
-		tmp = glm::rotate(tmp, -CAM_ROT_SENSITIVITY * TO_RADIAN, u);
-		tmp = glm::translate(tmp, -camera[0].vrp);
-		break;
-	case GLUT_KEY_DOWN:
-		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
-		tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, u);
-		tmp = glm::translate(tmp, -camera[0].vrp);
-		break;
-	case GLUT_KEY_LEFT:
-		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
-		tmp = glm::rotate(tmp, -CAM_ROT_SENSITIVITY * TO_RADIAN, v);
-		tmp = glm::translate(tmp, -camera[0].vrp);
-		break;
-	case GLUT_KEY_RIGHT:
-		tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
-		tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, v);
-		tmp = glm::translate(tmp, -camera[0].vrp);
-		break;
+	if (view_mode == VIEW_FIELD) {
+		float view_angle;
+		glm::vec3 dif;
 
-	/*case GLUT_KEY_ALT_L:
-		if (glutGetModifiers() && GLUT_ACTIVE_ALT)
-			ironman_fly = 1;
-		else
-			ironman_fly = 0;*/
-	
+		if (glutGetModifiers() == GLUT_ACTIVE_CTRL) {
+			switch (key) {
+			case GLUT_KEY_UP:		// move upward
+				dif = glm::vec3(0, 0, SUB_CAM_MOVING_SCENE);
+				camera[0].vrp += dif;
+				camera[0].prp += dif;
+
+				break;
+			case GLUT_KEY_DOWN:		// move downward
+				dif = glm::vec3(0, 0, SUB_CAM_MOVING_SCENE);
+				camera[0].vrp -= dif;
+				camera[0].prp -= dif;
+
+				break;
+			case GLUT_KEY_LEFT:		// rotate left
+				tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+				tmp = glm::rotate(tmp, SUB_CAM_MOVING_SCENE * TO_RADIAN, glm::vec3(0, 0, 1));
+				tmp = glm::translate(tmp, -camera[0].vrp);
+
+				camera[0].vrp = glm::vec3(tmp * glm::vec4(camera[0].vrp, 0.0f));
+				printf("%.2f %.2f %.2f\n", camera[0].vrp[0], camera[0].vrp[1], camera[0].vrp[2]);
+				break;
+			case GLUT_KEY_RIGHT:	// rotate right
+				tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+				tmp = glm::rotate(tmp, -SUB_CAM_MOVING_SCENE * TO_RADIAN, glm::vec3(0, 0, 1));
+				tmp = glm::translate(tmp, -camera[0].vrp);
+
+				camera[0].vrp = glm::vec3(tmp * glm::vec4(camera[0].vrp, 0.0f));
+				printf("%.2f %.2f %.2f\n", camera[0].vrp[0], camera[0].vrp[1], camera[0].vrp[2]);
+
+				break;
+			}
+		}
+		else {
+			switch (key) {
+			case GLUT_KEY_UP:		// move forward
+				view_angle = atan(n[1] / n[0]);
+				dif = glm::vec3(SUB_CAM_MOVING_SCENE * cos(view_angle), SUB_CAM_MOVING_SCENE * sin(view_angle), 0);
+				camera[0].vrp += dif;
+				camera[0].prp += dif;
+
+				break;
+			case GLUT_KEY_DOWN:		// move backward
+				view_angle = atan(n[1] / n[0]);
+				dif = glm::vec3(SUB_CAM_MOVING_SCENE * cos(view_angle), SUB_CAM_MOVING_SCENE * sin(view_angle), 0);
+				camera[0].vrp -= dif;
+				camera[0].prp -= dif;
+
+				break;
+			case GLUT_KEY_LEFT:		// move left
+				view_angle = atan(u[1] / u[0]);
+				dif = glm::vec3(SUB_CAM_MOVING_SCENE * cos(view_angle), SUB_CAM_MOVING_SCENE * sin(view_angle), 0);
+
+				camera[0].vrp += dif;
+				camera[0].prp += dif;
+
+				break;
+			case GLUT_KEY_RIGHT:	// move right
+				view_angle = atan(u[1] / u[0]);
+				dif = glm::vec3(SUB_CAM_MOVING_SCENE * cos(view_angle), SUB_CAM_MOVING_SCENE * sin(view_angle), 0);
+
+				camera[0].vrp -= dif;
+				camera[0].prp -= dif;
+
+				break;
+			}
+		}
+	}
+	else {
+		switch (key) {
+		case GLUT_KEY_UP:
+			tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+			tmp = glm::rotate(tmp, -CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+			tmp = glm::translate(tmp, -camera[0].vrp);
+
+			break;
+		case GLUT_KEY_DOWN:
+			tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+			tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, u);
+			tmp = glm::translate(tmp, -camera[0].vrp);
+
+			break;
+		case GLUT_KEY_LEFT:
+			tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+			tmp = glm::rotate(tmp, -CAM_ROT_SENSITIVITY * TO_RADIAN, v);
+			tmp = glm::translate(tmp, -camera[0].vrp);
+
+			break;
+		case GLUT_KEY_RIGHT:
+			tmp = glm::translate(glm::mat4(1.0f), camera[0].vrp);
+			tmp = glm::rotate(tmp, CAM_ROT_SENSITIVITY * TO_RADIAN, v);
+			tmp = glm::translate(tmp, -camera[0].vrp);
+
+			break;
+		}
 	}
 
-	camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
-	camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
+	if (view_mode != VIEW_FIELD) {
+		camera[0].prp = glm::vec3(tmp * glm::vec4(camera[0].prp, 1.0f));
+		camera[0].vup = glm::vec3(tmp * glm::vec4(camera[0].vup, 0.0f));
+	}
 
 	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
 	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
