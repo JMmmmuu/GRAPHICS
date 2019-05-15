@@ -131,6 +131,7 @@ int set_Cam_to_target() {
 		return 0;
 	if (camera[0].prp[2] - target_cam.prp[2] > 0.01 || camera[0].prp[2] - target_cam.prp[2] < -0.01)
 		return 0;
+	return 1;
 }
 
 #define MOVING_CAM_SCENE 30.0f

@@ -259,6 +259,100 @@ void draw_circle() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
+GLuint RUSH_VBO, RUSH_VAO;
+GLfloat RUSH_vertices[740][3];
+int R_idx, U_idx, S_idx, H_idx, tot_idx;
+
+void setVertex(GLfloat (*vertex)[3], GLfloat x, GLfloat y, GLfloat z) {
+	(*vertex)[0] = x; 	(*vertex)[1] = y; 	(*vertex)[2] = z;
+}
+
+void prepare_RUSH() {
+	// set RUSH vertices
+
+	int idx = 0;
+	R_idx = 0;
+	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.7, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.5, -0.7, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.6, 0);
+	//setVertex(&(RUSH_vertices[3]), 0.2, 0.6, 0);
+	for (int i = 0; i < 180; i++) {
+		RUSH_vertices[idx][0] = 0.2 + 0.25 * cos((90 - i) * TO_RADIAN);
+		RUSH_vertices[idx][1] = 0.35 + 0.25 * sin((90 - i) * TO_RADIAN);
+		RUSH_vertices[idx++][2] = 0;
+	}
+	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.1, 0);
+	setVertex(&(RUSH_vertices[idx++]), 0.42, -0.7, 0);
+
+	U_idx = idx;
+	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.75, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.5, -0.23, 0);
+	for (int i = 0; i < 180; i++) {
+		RUSH_vertices[idx][0] = 0.5 * cos((180 + i) * TO_RADIAN);
+		RUSH_vertices[idx][1] = -0.23 + 0.5 * sin((180 + i) * TO_RADIAN);
+		RUSH_vertices[idx++][2] = 0;
+	}
+	setVertex(&(RUSH_vertices[idx++]), 0.5, -0.23, 0);
+	setVertex(&(RUSH_vertices[idx++]), 0.5, 0.75, 0);
+
+	S_idx = idx;
+	setVertex(&(RUSH_vertices[idx++]), 0.62, 0.65, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.4, 0.65, 0);
+	for (int i = 0; i < 180; i++) {
+		RUSH_vertices[idx][0] = -0.4 + 0.325 * cos((90 + i) * TO_RADIAN);
+		RUSH_vertices[idx][1] = 0.325 + 0.325 * sin((90 + i) * TO_RADIAN);
+		RUSH_vertices[idx++][2] = 0;
+	}
+	for (int i = 0; i < 180; i++) {
+		RUSH_vertices[idx][0] = 0.4 + 0.325 * cos((90 - i) * TO_RADIAN);
+		RUSH_vertices[idx][1] = -0.325 + 0.5 * sin((90 - i) * TO_RADIAN);
+		RUSH_vertices[idx++][2] = 0;
+	}
+	setVertex(&(RUSH_vertices[idx++]), 0.4, -0.65, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.62, -0.65, 0);
+
+	H_idx = idx;
+	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.73, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.5, -0.73, 0);
+	setVertex(&(RUSH_vertices[idx++]), -0.5, 0, 0);
+	setVertex(&(RUSH_vertices[idx++]), 0.5, 0, 0);
+	setVertex(&(RUSH_vertices[idx++]), 0.5, 0.73, 0);
+	setVertex(&(RUSH_vertices[idx++]), 0.5, -0.73, 0);
+	tot_idx = idx;
+	printf("%d\n", idx);
+	// Initialize vertex buffer object.
+	glGenBuffers(1, &RUSH_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, RUSH_VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(RUSH_vertices), &RUSH_vertices[0][0], GL_STATIC_DRAW);
+
+
+	// Initialize vertex array object.
+	glGenVertexArrays(1, &RUSH_VAO);
+	glBindVertexArray(RUSH_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, RUSH_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void draw_RUSH() {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	GLfloat color[3] = { 180.0f / 255, 0.0f / 255, 0.0f / 255 };
+	glBindVertexArray(RUSH_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glDrawArrays(GL_LINE_STRIP, R_idx, U_idx);
+	glDrawArrays(GL_LINE_STRIP, U_idx, S_idx - U_idx);
+	glDrawArrays(GL_LINE_STRIP, S_idx, H_idx - S_idx);
+	glDrawArrays(GL_LINE_STRIP, H_idx, tot_idx - H_idx);
+	glBindVertexArray(0);
+}
+
 /*GLuint cylinder_VBO, cylinder_VAO;
 GLfloat cylinder_vertices[722][8];
 

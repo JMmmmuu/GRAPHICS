@@ -74,6 +74,7 @@ void prepare_scene() {
 	prepare_points();
 	prepare_circle();
 	//prepare_cylinder();
+	prepare_RUSH();
 
 	prepare_obj1();
 	prepare_obj2();

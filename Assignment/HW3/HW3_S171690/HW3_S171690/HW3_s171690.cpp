@@ -222,8 +222,12 @@ void display_camera(int camera_index) {
 	draw_obj3();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+	// RUSH
+	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 110, 100));
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
 
-
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_RUSH();
 
 
 
@@ -439,10 +443,6 @@ void timer_scene_2(int value) {
 			else {
 				cow_pos[1] = -(y * 113.0f / 2) + (rand() % (int)blk_size * 2);
 			}
-
-
-			//sign = rand() % 2 ? 1 : -1;
-			//cow_pos[1] = y * (rand() % 80) * sign;
 		}
 
 		cylinder_z_1 += 0.1;
