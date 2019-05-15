@@ -1,6 +1,8 @@
 #define MAX_CAR_TIME 25
 #define MIN_CAR_TIME 1
 
+int animation = 1;
+
 float car_pos_x, car_pos_y, car_rotation_angle, car_timer_scene = 10.0f;
 int car_left_flag = 1;
 

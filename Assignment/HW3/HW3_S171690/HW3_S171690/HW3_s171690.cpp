@@ -235,6 +235,8 @@ void display() {
 }
 
 void car_timer(int value) {
+	if (!animation) return;
+
 	// CAR
 	static int car_idx = 1;
 	static int tmp = 1;
@@ -345,6 +347,8 @@ void car_timer(int value) {
 	glutTimerFunc(car_timer_scene, car_timer, (value + 1) % INT_MAX);
 }
 void timer_scene(int value) {
+	if (!animation) return;
+
 	// TIGER
 	cur_frame_tiger = (value / 3) % N_TIGER_FRAMES;
 	cur_frame_ben = value % N_BEN_FRAMES;
@@ -404,6 +408,8 @@ void timer_scene(int value) {
 	glutTimerFunc(10, timer_scene, (value + 1) % INT_MAX);
 }
 void timer_scene_2(int value) {
+	if (!animation) return;
+
 	int sign;
 	float y = (11 + 20) / 17.0f;
 	float tmp;
@@ -542,6 +548,13 @@ void keyboard(unsigned char key, int x, int y) {
 		printf("%f\n", car_timer_scene);
 		break;
 
+	case 'a':
+		animation = 1 - animation;
+		if (animation) {
+			glutTimerFunc(100, car_timer, 0);
+			glutTimerFunc(100, timer_scene, 0);
+			glutTimerFunc(1, timer_scene_2, 0);
+		}
 
 	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
@@ -555,6 +568,7 @@ void keyboard(unsigned char key, int x, int y) {
 		glutLeaveMainLoop();
 		break;
 	}
+	glutPostRedisplay();
 }
 
 #define SUB_CAM_MOVING_SCENE 15
@@ -755,9 +769,11 @@ void register_callbacks(void) {
 	glutSpecialFunc(special);
 	glutMotionFunc(motion);
 	glutReshapeFunc(reshape);
+
 	glutTimerFunc(100, car_timer, 0);
 	glutTimerFunc(100, timer_scene, 0);
 	glutTimerFunc(1, timer_scene_2, 0);
+	
 	glutCloseFunc(cleanup);
 }
 
