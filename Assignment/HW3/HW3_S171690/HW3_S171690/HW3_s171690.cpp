@@ -89,27 +89,14 @@ void display_camera(int camera_index) {
 	draw_partial_line(255, 255, 255);
 
 	// draw CAR
-	//ModelMatrix_CAR_BODY = glm::rotate(glm::mat4(1.0f), -rotation_angle_car, glm::vec3(0.0f, 1.0f, 0.0f));
-	/*ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f, 3.0f, 3.0f));
-	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 5.0f));
-	
-	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, (car_rotation_angle + 90.0f) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
-
-	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_BODY;
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_car_dummy();*/
-
-
-	//ModelMatrix_CAR_BODY = glm::scale(glm::mat4(1.0f), glm::vec3(142.5f, 113.0f, 3.0f));
 	if (car_left_flag) 
-		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f + 142.5f, car_pos_y * 113.0f, 15.0f));
+		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f + 142.5f, car_pos_y * 113.0f, 16.0f));
 	else 
-		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f - 142.5f, car_pos_y * 113.0f, 15.0f));
+		ModelMatrix_CAR_BODY = glm::translate(glm::mat4(1.0f), glm::vec3(car_pos_x * 142.5f - 142.5f, car_pos_y * 113.0f, 16.0f));
 	ModelMatrix_CAR_BODY = glm::scale(ModelMatrix_CAR_BODY, glm::vec3(3.0f, 3.0f, 3.0f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, (car_rotation_angle + 90.0f) * TO_RADIAN, glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelMatrix_CAR_BODY = glm::rotate(ModelMatrix_CAR_BODY, 90.0f*TO_RADIAN, glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 1.0f));
+	//ModelMatrix_CAR_BODY = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(0.0f, 0.0f, 1.0f));
 
 	if (view_mode == DRIVER_PERS) set_ViewMatrix_for_driver();
 	else if (view_mode == VIEW_CAR) set_ViewMatrix_for_CAR(car_left_flag, car_pos_x, car_pos_y);
@@ -340,9 +327,11 @@ void timer_scene(int value) {
 		}
 	}
 
-	float ra = 3.0f;
-	rotation_angle_wheel += 5;// (del_pos / ra) * 2;
+	float ra = 6.0f;
+	//rotation_angle_wheel += 5;// (del_pos / ra) * 2;
+	rotation_angle_wheel += (del_pos / ra) * TO_DEGREE;
 	if (rotation_angle_wheel >= 360) rotation_angle_wheel -= 360;
+	printf("%f\t%f\t%f\t%f\n", car_pos_x, car_pos_y, del_pos, rotation_angle_wheel);
 
 	// TIGER
 	cur_frame_tiger = (value / 3) % N_TIGER_FRAMES;
@@ -565,8 +554,6 @@ void special(int key, int x, int y) {
 	if (view_mode == VIEW_FIELD) {
 		float view_angle;
 		glm::vec3 dif;
-
-		float th;
 		
 		if (glutGetModifiers() == GLUT_ACTIVE_CTRL) {
 			switch (key) {
@@ -589,13 +576,6 @@ void special(int key, int x, int y) {
 
 				camera[0].vrp = glm::vec3(tmp * glm::vec4(camera[0].vrp, 1.0f));
 
-				th = atan(n[1] / n[0]) * TO_DEGREE;
-
-				
-				printf("%.2f %.2f %.2f\n", camera[0].prp[0], camera[0].prp[1], camera[0].prp[2]);
-				printf("%.2f %.2f %.2f\n", camera[0].vrp[0], camera[0].vrp[1], camera[0].vrp[2]);
-				n = normalize(n);
-				printf("%.2f %.2f %.2f %.2f\n\n", n[0], n[1], n[2], th);
 				break;
 			case GLUT_KEY_RIGHT:	// rotate right
 				tmp = glm::translate(glm::mat4(1.0f), camera[0].prp);
@@ -603,25 +583,6 @@ void special(int key, int x, int y) {
 				tmp = glm::translate(tmp, -camera[0].prp);
 
 				camera[0].vrp = glm::vec3(tmp * glm::vec4(camera[0].vrp, 1.0f));
-
-				/*view_angle = atan(u[1] / u[0]);
-				dif[0] = SUB_CAM_MOVING_SCENE * cos(view_angle);
-				printf("%.2f %.2f ", cos(view_angle), sin(view_angle));
-
-				view_angle = atan(n[1] / n[0]);
-				dif[1] = -SUB_CAM_MOVING_SCENE * sin(view_angle);
-				printf("%.2f %.2f\n", cos(view_angle), sin(view_angle));
-
-				dif[0] = 0;
-				camera[0].vrp -= dif;*/
-
-				printf("%.2f %.2f %.2f\n", camera[0].prp[0], camera[0].prp[1], camera[0].prp[2]);
-				printf("%.2f %.2f %.2f\n", camera[0].vrp[0], camera[0].vrp[1], camera[0].vrp[2]);
-				n = normalize(n);
-				th = atan(n[1] / n[0]) * TO_DEGREE;
-
-				printf("%.2f %.2f %.2f %.2f\n\n", n[0], n[1], n[2], th);
-
 
 				break;
 			}
