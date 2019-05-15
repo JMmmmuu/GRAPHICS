@@ -328,7 +328,6 @@ void timer_scene(int value) {
 	}
 
 	float ra = 6.0f;
-	//rotation_angle_wheel += 5;// (del_pos / ra) * 2;
 	rotation_angle_wheel += (del_pos / ra) * TO_DEGREE;
 	if (rotation_angle_wheel >= 360) rotation_angle_wheel -= 360;
 	printf("%f\t%f\t%f\t%f\n", car_pos_x, car_pos_y, del_pos, rotation_angle_wheel);

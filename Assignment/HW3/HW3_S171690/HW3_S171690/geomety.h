@@ -729,6 +729,7 @@ void free_geom_obj(int geom_obj_ID) {
 float rad = 1.7f;
 float ww = 1.0f;
 float rotation_angle_wheel = 0.0f;
+float rotation_angle_vert_wheel = 30.0f;
 
 void draw_wheel_and_nut() {
 	// angle is used in Hierarchical_Car_Correct later
@@ -737,12 +738,12 @@ void draw_wheel_and_nut() {
 	glUniform3f(loc_primitive_color, 0.000f, 0.808f, 0.820f); // color name: DarkTurquoise
 	draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL); // draw wheel
 
+	glm::vec3 nut_pos;
+
 	for (i = 0; i < 5; i++) {
 		ModelMatrix_CAR_NUT = glm::rotate(ModelMatrix_CAR_WHEEL, TO_RADIAN*72.0f*i, glm::vec3(0.0f, 0.0f, 1.0f));
-		ModelMatrix_CAR_NUT = glm::rotate(ModelMatrix_CAR_NUT, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 		ModelMatrix_CAR_NUT = glm::translate(ModelMatrix_CAR_NUT, glm::vec3(rad - 0.5f, 0.0f, ww));
 		ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_NUT;
-
 		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 
 		glUniform3f(loc_primitive_color, 0.690f, 0.769f, 0.871f); // color name: LightSteelBlue
@@ -767,28 +768,32 @@ void draw_car_dummy(void) {
 	glLineWidth(1.0f);
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(-3.9f, -3.5f, 4.5f));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * TO_RADIAN, glm::vec3(0, 1, 0));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_wheel_and_nut();  // draw wheel 0
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, 4.5f));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * TO_RADIAN, glm::vec3(0, 1, 0));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_wheel_and_nut();  // draw wheel 1
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(-3.9f, -3.5f, -4.5f));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * TO_RADIAN, glm::vec3(0, 1, 0));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelMatrix_CAR_WHEEL = glm::scale(ModelMatrix_CAR_WHEEL, glm::vec3(1.0f, 1.0f, -1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_wheel_and_nut();  // draw wheel 2
 
 	ModelMatrix_CAR_WHEEL = glm::translate(ModelMatrix_CAR_BODY, glm::vec3(3.9f, -3.5f, -4.5f));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_vert_wheel * TO_RADIAN, glm::vec3(0, 1, 0));
+	ModelMatrix_CAR_WHEEL = glm::rotate(ModelMatrix_CAR_WHEEL, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelMatrix_CAR_WHEEL = glm::scale(ModelMatrix_CAR_WHEEL, glm::vec3(1.0f, 1.0f, -1.0f));
 	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_CAR_WHEEL;
-	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, rotation_angle_wheel * TO_RADIAN, glm::vec3(0, 0, 1));
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_wheel_and_nut();  // draw wheel 3
 }
