@@ -169,21 +169,25 @@ void moveCam() {
 }
 
 void reset_CAM() {
-	camera[0].prp = glm::vec3(500.0f, 400.0f, 400.0f);
-	camera[0].vrp = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera[0].vup = glm::vec3(0.0f, 0.0f, 1.0f);
-	//ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
+	target_cam.prp = glm::vec3(500.0f, 400.0f, 400.0f);
+	target_cam.vrp = glm::vec3(0.0f, 0.0f, 0.0f);
+	target_cam.vup = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	camera[0].fov_y = 45.0f;
-	camera[0].aspect_ratio = 1.0f;
-	camera[0].near_clip = 0.1f;
-	camera[0].far_clip = 1200.0f;
-	camera[0].zoom_factor = 1.0f;
+	target_cam.fov_y = 45.0f;
+	target_cam.aspect_ratio = 1.0f;
+	target_cam.near_clip = 0.1f;
+	target_cam.far_clip = 1200.0f;
+	target_cam.zoom_factor = 1.0f;
 
 	view_mode = VIEW_WORLD;
+	cam_moving = 1;
 
-	ViewMatrix[0] = glm::lookAt(camera[0].prp, camera[0].vrp, camera[0].vup);
-	ViewProjectionMatrix[0] = ProjectionMatrix[0] * ViewMatrix[0];
-
-	glutPostRedisplay();
+	cam_dif.vrp = target_cam.vrp - camera[0].vrp;
+	cam_dif.prp = target_cam.prp - camera[0].prp;
+	cam_dif.vup = target_cam.vup - camera[0].vup;
+	cam_dif.aspect_ratio = target_cam.aspect_ratio - camera[0].aspect_ratio;
+	cam_dif.far_clip = target_cam.aspect_ratio - camera[0].far_clip;
+	cam_dif.fov_y = target_cam.fov_y - camera[0].fov_y;
+	cam_dif.near_clip = target_cam.near_clip - camera[0].near_clip;
+	cam_dif.zoom_factor = target_cam.zoom_factor - camera[0].zoom_factor;
 }

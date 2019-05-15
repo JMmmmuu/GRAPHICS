@@ -29,7 +29,7 @@ glm::mat4 ModelMatrix_CAR_BODY_to_DRIVER; // computed only once in initialize_ca
 glm::mat4 ModelMatrix_TIGER, ModelMatrix_TIGER_PERS;
 
 #include "camera.h"
-int flag_polygon_fill = 0;
+int flag_polygon_fill = 1;
 
 #include "geomety.h"
 
@@ -200,7 +200,10 @@ void display_camera(int camera_index) {
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(202.5, -80, 100));
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (flag_polygon_fill)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_obj1();
 	
@@ -555,14 +558,14 @@ void keyboard(unsigned char key, int x, int y) {
 			glutTimerFunc(100, timer_scene, 0);
 			glutTimerFunc(1, timer_scene_2, 0);
 		}
-
+		break;
 	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
-		if (flag_polygon_fill)
+		/*if (flag_polygon_fill)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glutPostRedisplay();
+		glutPostRedisplay();*/
 		break;
 	case 27:		// ESC key
 		glutLeaveMainLoop();
