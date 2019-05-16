@@ -74,9 +74,6 @@ void getTigerPos() {
 		break;
 	}
 
-	//printf("\n\n%d\t%.4f %.4f\n", outOfField(), tiger_pos_x, tiger_pos_y);
-	//printf("%d\n\n", theta);
-
 	tiger_pos_x = prev_tiger_pos[0] + tiger_speed * cos(theta * TO_RADIAN);
 	tiger_pos_y = prev_tiger_pos[1] + tiger_speed * sin(theta * TO_RADIAN);
 	tiger_rotation_angle = theta;

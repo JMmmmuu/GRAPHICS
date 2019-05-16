@@ -84,7 +84,7 @@ void prepare_partial() {
 	partial_vertices[i][0] = x; partial_vertices[i][1] = y-ra; partial_vertices[i][2] = 0;
 	partial_vertices[i][3] = 0; partial_vertices[i][4] = 0; partial_vertices[i][5] = 1;
 	partial_vertices[i][6] = 0; partial_vertices[i][7] = 0;
-	fprintf(stdout, "%d %f %f %f\n", i, x, y, ra);
+	//fprintf(stdout, "%d %f %f %f\n", i, x, y, ra);
 
 	// Initialize vertex buffer object.
 
@@ -358,7 +358,6 @@ void draw_RUSH() {
 	float blk = y * 2 / 5.0f;
 	
 	glm::vec3 sc_ra = { 62.0f, 50.0f, 30.0f };
-	printf("%.2f %.2f %.2f %.2f\n", -y + blk, -y + blk * 2, -y + blk * 3, -y + blk * 4);
 
 	glBindVertexArray(RUSH_VAO);
 	glUniform3fv(loc_primitive_color, 1, color);
@@ -869,7 +868,7 @@ int read_geometry_file(GLfloat **object, char *filename, GEOM_OBJ_TYPE geom_obj_
 	float *flt_ptr;
 	FILE *fp;
 
-	fprintf(stdout, "Reading geometry from the geometry file %s...\n", filename);
+	//fprintf(stdout, "Reading geometry from the geometry file %s...\n", filename);
 	fp = fopen(filename, "r");
 	if (fp == NULL) {
 		fprintf(stderr, "Cannot open the geometry file %s ...", filename);
@@ -888,7 +887,7 @@ int read_geometry_file(GLfloat **object, char *filename, GEOM_OBJ_TYPE geom_obj_
 		fscanf(fp, "%f", flt_ptr++);
 	fclose(fp);
 
-	fprintf(stdout, "Read %d primitives successfully.\n\n", n_triangles);
+	//fprintf(stdout, "Read %d primitives successfully.\n\n", n_triangles);
 
 	return n_triangles;
 }

@@ -32,7 +32,6 @@ glm::mat4 ModelMatrix_TIGER, ModelMatrix_TIGER_PERS;
 int flag_polygon_fill = 1;
 
 #include "geomety.h"
-
 #include "myFunc.h"
 
 void display_camera(int camera_index) {
@@ -118,7 +117,6 @@ void display_camera(int camera_index) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_tiger();
 
-
 	// DRAW SPIDER
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], spider_pos);
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(20.0f, 20.0f, 20.0f));
@@ -127,7 +125,6 @@ void display_camera(int camera_index) {
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_spider();
-
 
 	// DRAW BEN
 	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(ben_pos_x * 110.0f - 142.5f, ben_pos_y * 95.0f, 0.0f));
@@ -138,7 +135,6 @@ void display_camera(int camera_index) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_ben();
 	
-
 	// DRAW COW
 	cow_tiger_collision();
 	if (cow_tiger_collide) {
@@ -153,7 +149,6 @@ void display_camera(int camera_index) {
 		glUniform3f(loc_primitive_color, 178 / 255.0f, 132 / 255.0f, 190 / 255.0f);
 		draw_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);
 		
-
 		// cylinder at rand position
 		ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], cow_pos);
 		ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(14.0f, 14.0f, 14.0f * cylinder_z_2));
@@ -242,14 +237,11 @@ void display_camera(int camera_index) {
 
 	// RUSH
 	if (RUSHON) {
-		ModelMatrix_RUSH = glm::translate(glm::mat4(1.0f), glm::vec3(-142.5f, 0, 3));
+		ModelMatrix_RUSH = glm::translate(glm::mat4(1.0f), glm::vec3(-142.5f, 0, 1));
 		ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_RUSH;
 		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 		draw_RUSH();
 	}
-
-
-
 }
 
 void display() {
@@ -266,6 +258,7 @@ void display() {
 	glutSwapBuffers();
 }
 
+// TIMER FUNC
 void car_timer(int value) {
 	if (!animation) return;
 
@@ -396,7 +389,6 @@ void timer_scene(int value) {
 	cur_frame_spider = (value / 3) % N_SPIDER_FRAMES;
 	cur_frame_wolf = (value / 3) % N_WOLF_FRAMES;
 
-
 	//  BEN
 	static int ben_idx = 1, ben_tmp = 1;
 	float ben_speed = 0.03f;
@@ -494,6 +486,8 @@ void timer_scene_2(int value) {
 	glutTimerFunc(1, timer_scene_2, (value + 1) % INT_MAX);
 }
 
+
+// KEY USED & MOTION
 unsigned int leftbutton_pressed = 0;
 int prevx, prevy;
 void mousePressed(int button, int state, int x, int y) {
@@ -588,17 +582,13 @@ void keyboard(unsigned char key, int x, int y) {
 
 	case 'm':
 		car_timer_scene *= (8.0f / 10);
-		printf("%f\n", car_timer_scene);
-
 		if (car_timer_scene < MIN_CAR_TIME)
 			car_timer_scene = MIN_CAR_TIME;
-		printf("%f\n", car_timer_scene);
 		break;
 	case 'n':
 		car_timer_scene *= (12.0f / 10);
 		if (car_timer_scene > MAX_CAR_TIME)
 			car_timer_scene = MAX_CAR_TIME;
-		printf("%f\n", car_timer_scene);
 		break;
 
 	case 'x':
@@ -856,7 +846,7 @@ void register_callbacks(void) {
 #define N_MESSAGE_LINES 1
 int main(int argc, char* argv[]) {
 	char program_name[64] = "20171690 Yuseok - 3D Objects";
-	char messages[N_MESSAGE_LINES][256] = { "\tSogang CSE4170 3d Objects\n\t20171690\n\tYuseok\n\n\t- Key used: \n" };
+	char messages[N_MESSAGE_LINES][256] = { "\tSogang CSE4170 3D Objects\n\t20171690\n\tYuseok\n\n\t- Key used: \n" };
 
 
 	glutInit(&argc, argv);

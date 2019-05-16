@@ -122,11 +122,19 @@ void greetings(char *program_name, char messages[][256], int n_message_lines) {
 	fprintf(stdout, "  PROGRAM NAME: %s\n\n", program_name);
 	fprintf(stdout, "  Created by Yuseok Jung\n");
 	fprintf(stdout, "  Student ID: 20171690\n");
-	fprintf(stdout, "  Date: 2019.05.20 Mon");
+	fprintf(stdout, "  Date: 2019.05.20 Mon\n\n");
 
 	for (int i = 0; i < n_message_lines; i++)
 		fprintf(stdout, "%s\n", messages[i]);
 	fprintf(stdout, "\n**************************************************************\n\n");
+
+	fprintf(stdout, "\tMOVE CAM\t\tKEY-UP, KEY-DOWN, KEY-LEFT, KEY-RIGHT\n");
+	fprintf(stdout, "\t        \t\tr, b, l, w, d, c, t\n");
+	fprintf(stdout, "\t        \t\tCTRL + KEY-UP, CTRL+KEY-DOWN, CTRL + KEY-LEFT, CTRL + KEY-RIGHT\n");
+	fprintf(stdout, "\tZOOM IN/ OUT\t\tSHIFT + MOUSE_LEFT_BUTTON\n");
+	fprintf(stdout, "\tCONTROL ANIMATION\ti, a, m, n, x, z, h\n");
+	fprintf(stdout, "\tLETTER\t\t\th\n");
+	fprintf(stdout, "\tPOLYGON MODE\t\tp\n");
 
 	initialize_glew();
 }
