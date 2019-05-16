@@ -204,3 +204,11 @@ void get_ironman_pos() {
 			ironman_pos[2] = 30.0f;
 	}
 }
+
+glm::vec3 wolf_pos = { 0.0f, 0.0f, 30.0f };
+int wolf_rotation_angle = 0;
+float wolf_radius = 30;
+void get_wolf_pos() {
+	wolf_pos[0] = wolf_radius * cos(wolf_rotation_angle * TO_RADIAN);
+	wolf_pos[1] = wolf_radius * sin(wolf_rotation_angle * TO_RADIAN);
+}

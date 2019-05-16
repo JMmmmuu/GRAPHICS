@@ -147,21 +147,21 @@ GLfloat axes_color[3][3] = { { 1.0f, 0.0f, 0.0f },{ 0.0f, 1.0f, 0.0f },{ 0.0f, 0
 
 void prepare_axes(void) {
 	// Initialize vertex buffer object.
-	glGenBuffers(1, &axes_VBO);
+		glGenBuffers(1, &axes_VBO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, axes_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(axes_vertices), &axes_vertices[0][0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, axes_VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(axes_vertices), &axes_vertices[0][0], GL_STATIC_DRAW);
 
-	// Initialize vertex array object.
-	glGenVertexArrays(1, &axes_VAO);
-	glBindVertexArray(axes_VAO);
+		// Initialize vertex array object.
+		glGenVertexArrays(1, &axes_VAO);
+		glBindVertexArray(axes_VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, axes_VBO);
-	glVertexAttribPointer(INDEX_VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
-	glEnableVertexAttribArray(INDEX_VERTEX_POSITION);
+		glBindBuffer(GL_ARRAY_BUFFER, axes_VBO);
+		glVertexAttribPointer(INDEX_VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+		glEnableVertexAttribArray(INDEX_VERTEX_POSITION);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 }
 
 void draw_axes(void) {
@@ -260,8 +260,10 @@ void draw_circle() {
 }
 
 GLuint RUSH_VBO, RUSH_VAO;
-GLfloat RUSH_vertices[740][3];
+GLfloat RUSH_vertices[750][3];
 int R_idx, U_idx, S_idx, H_idx, tot_idx;
+glm::mat4 ModelMatrix_RUSH;
+int RUSHON = 0;
 
 void setVertex(GLfloat (*vertex)[3], GLfloat x, GLfloat y, GLfloat z) {
 	(*vertex)[0] = x; 	(*vertex)[1] = y; 	(*vertex)[2] = z;
@@ -270,6 +272,7 @@ void setVertex(GLfloat (*vertex)[3], GLfloat x, GLfloat y, GLfloat z) {
 void prepare_RUSH() {
 	// set RUSH vertices
 
+	// R
 	int idx = 0;
 	R_idx = 0;
 	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.7, 0);
@@ -281,9 +284,12 @@ void prepare_RUSH() {
 		RUSH_vertices[idx][1] = 0.35 + 0.25 * sin((90 - i) * TO_RADIAN);
 		RUSH_vertices[idx++][2] = 0;
 	}
+	setVertex(&(RUSH_vertices[idx++]), 0.2, 0.1, 0);
 	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.1, 0);
 	setVertex(&(RUSH_vertices[idx++]), 0.42, -0.7, 0);
 
+
+	// U
 	U_idx = idx;
 	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.75, 0);
 	setVertex(&(RUSH_vertices[idx++]), -0.5, -0.23, 0);
@@ -295,22 +301,24 @@ void prepare_RUSH() {
 	setVertex(&(RUSH_vertices[idx++]), 0.5, -0.23, 0);
 	setVertex(&(RUSH_vertices[idx++]), 0.5, 0.75, 0);
 
+	// S
 	S_idx = idx;
 	setVertex(&(RUSH_vertices[idx++]), 0.62, 0.65, 0);
 	setVertex(&(RUSH_vertices[idx++]), -0.4, 0.65, 0);
-	for (int i = 0; i < 180; i++) {
+	for (int i = 0; i <= 180; i++) {
 		RUSH_vertices[idx][0] = -0.4 + 0.325 * cos((90 + i) * TO_RADIAN);
 		RUSH_vertices[idx][1] = 0.325 + 0.325 * sin((90 + i) * TO_RADIAN);
 		RUSH_vertices[idx++][2] = 0;
 	}
 	for (int i = 0; i < 180; i++) {
 		RUSH_vertices[idx][0] = 0.4 + 0.325 * cos((90 - i) * TO_RADIAN);
-		RUSH_vertices[idx][1] = -0.325 + 0.5 * sin((90 - i) * TO_RADIAN);
+		RUSH_vertices[idx][1] = -0.325 + 0.325 * sin((90 - i) * TO_RADIAN);
 		RUSH_vertices[idx++][2] = 0;
 	}
 	setVertex(&(RUSH_vertices[idx++]), 0.4, -0.65, 0);
 	setVertex(&(RUSH_vertices[idx++]), -0.62, -0.65, 0);
 
+	// H
 	H_idx = idx;
 	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.73, 0);
 	setVertex(&(RUSH_vertices[idx++]), -0.5, -0.73, 0);
@@ -319,7 +327,8 @@ void prepare_RUSH() {
 	setVertex(&(RUSH_vertices[idx++]), 0.5, 0.73, 0);
 	setVertex(&(RUSH_vertices[idx++]), 0.5, -0.73, 0);
 	tot_idx = idx;
-	printf("%d\n", idx);
+	//printf("%d\n", idx);
+
 	// Initialize vertex buffer object.
 	glGenBuffers(1, &RUSH_VBO);
 
@@ -332,24 +341,66 @@ void prepare_RUSH() {
 	glBindVertexArray(RUSH_VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, RUSH_VBO);
-	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), BUFFER_OFFSET(0));
-	glEnableVertexAttribArray(0);
-
+	glVertexAttribPointer(INDEX_VERTEX_POSITION, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(INDEX_VERTEX_POSITION);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
 void draw_RUSH() {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glLineWidth(10.0f);
 
 	GLfloat color[3] = { 180.0f / 255, 0.0f / 255, 0.0f / 255 };
+
+
+	float y = (11 + 20) / 17.0f * 90.0f;
+	float blk = y * 2 / 5.0f;
+	
+	glm::vec3 sc_ra = { 62.0f, 50.0f, 30.0f };
+	printf("%.2f %.2f %.2f %.2f\n", -y + blk, -y + blk * 2, -y + blk * 3, -y + blk * 4);
+
 	glBindVertexArray(RUSH_VAO);
 	glUniform3fv(loc_primitive_color, 1, color);
+	glm::mat4 ModelMatrix_R = glm::translate(ModelMatrix_RUSH, glm::vec3(0, - y + blk * 4, 0));
+	ModelMatrix_R = glm::scale(ModelMatrix_R, sc_ra);
+	ModelMatrix_R = glm::rotate(ModelMatrix_R, -90 * TO_RADIAN, glm::vec3(0, 0, 1));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_R;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glDrawArrays(GL_LINE_STRIP, R_idx, U_idx);
+
+
+	glBindVertexArray(RUSH_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glm::mat4 ModelMatrix_U = glm::translate(ModelMatrix_RUSH, glm::vec3(0, -y + blk * 3, 0));
+	ModelMatrix_U = glm::scale(ModelMatrix_U, sc_ra);
+	ModelMatrix_U = glm::rotate(ModelMatrix_U, -90 * TO_RADIAN, glm::vec3(0, 0, 1));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_U;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glDrawArrays(GL_LINE_STRIP, U_idx, S_idx - U_idx);
+
+
+	glBindVertexArray(RUSH_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glm::mat4 ModelMatrix_S = glm::translate(ModelMatrix_RUSH, glm::vec3(0, -y + blk * 2, 0));
+	ModelMatrix_S = glm::scale(ModelMatrix_S, sc_ra);
+	ModelMatrix_S = glm::rotate(ModelMatrix_S, -90 * TO_RADIAN, glm::vec3(0, 0, 1));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_S;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glDrawArrays(GL_LINE_STRIP, S_idx, H_idx - S_idx);
+
+
+	glBindVertexArray(RUSH_VAO);
+	glUniform3fv(loc_primitive_color, 1, color);
+	glm::mat4 ModelMatrix_H = glm::translate(ModelMatrix_RUSH, glm::vec3(0, -y + blk, 0));
+	ModelMatrix_H = glm::scale(ModelMatrix_H, sc_ra);
+	ModelMatrix_H = glm::rotate(ModelMatrix_H, -90 * TO_RADIAN, glm::vec3(0, 0, 1));
+	ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_H;
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	glDrawArrays(GL_LINE_STRIP, H_idx, tot_idx - H_idx);
+
+	glLineWidth(1.0f);
 	glBindVertexArray(0);
 }
 
@@ -446,6 +497,13 @@ GLuint ironman_VBO, ironman_VAO;
 int ironman_n_triangles;
 GLfloat *ironman_vertices;
 
+// wolf object
+#define N_WOLF_FRAMES 17
+GLuint wolf_VBO, wolf_VAO;
+int wolf_n_triangles[N_WOLF_FRAMES];
+int wolf_vertex_offset[N_WOLF_FRAMES];
+GLfloat *wolf_vertices[N_WOLF_FRAMES];
+int cur_frame_wolf = 0;
 
 int read_geometry(GLfloat **object, int bytes_per_primitive, char *filename) {
 	int n_triangles;
@@ -689,6 +747,54 @@ void prepare_ironman(void) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
+void prepare_wolf(void) {
+	int i, n_bytes_per_vertex, n_bytes_per_triangle, wolf_n_total_triangles = 0;
+	char filename[512];
+
+	n_bytes_per_vertex = 8 * sizeof(float); // 3 for vertex, 3 for normal, and 2 for texcoord
+	n_bytes_per_triangle = 3 * n_bytes_per_vertex;
+
+	for (i = 0; i < N_WOLF_FRAMES; i++) {
+		sprintf(filename, "Data/dynamic_objects/wolf/wolf_%02d_vnt.geom", i);
+		wolf_n_triangles[i] = read_geometry(&wolf_vertices[i], n_bytes_per_triangle, filename);
+		// assume all geometry files are effective
+		wolf_n_total_triangles += wolf_n_triangles[i];
+
+		if (i == 0)
+			wolf_vertex_offset[i] = 0;
+		else
+			wolf_vertex_offset[i] = wolf_vertex_offset[i - 1] + 3 * wolf_n_triangles[i - 1];
+	}
+
+	// initialize vertex buffer object
+	glGenBuffers(1, &wolf_VBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, wolf_VBO);
+	glBufferData(GL_ARRAY_BUFFER, wolf_n_total_triangles*n_bytes_per_triangle, NULL, GL_STATIC_DRAW);
+
+	for (i = 0; i < N_WOLF_FRAMES; i++)
+		glBufferSubData(GL_ARRAY_BUFFER, wolf_vertex_offset[i] * n_bytes_per_vertex,
+			wolf_n_triangles[i] * n_bytes_per_triangle, wolf_vertices[i]);
+
+	// as the geometry data exists now in graphics memory, ...
+	for (i = 0; i < N_WOLF_FRAMES; i++)
+		free(wolf_vertices[i]);
+
+	// initialize vertex array object
+	glGenVertexArrays(1, &wolf_VAO);
+	glBindVertexArray(wolf_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, wolf_VBO);
+	glVertexAttribPointer(LOC_VERTEX, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(0));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(LOC_NORMAL, 3, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(LOC_TEXCOORD, 2, GL_FLOAT, GL_FALSE, n_bytes_per_vertex, BUFFER_OFFSET(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
 
 
 void draw_tiger(void) {
@@ -724,6 +830,13 @@ void draw_ironman(void) {
 
 	glBindVertexArray(ironman_VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3 * ironman_n_triangles);
+	glBindVertexArray(0);
+}
+void draw_wolf(void) {
+	glFrontFace(GL_CW);
+
+	glBindVertexArray(wolf_VAO);
+	glDrawArrays(GL_TRIANGLES, wolf_vertex_offset[cur_frame_wolf], 3 * wolf_n_triangles[cur_frame_wolf]);
 	glBindVertexArray(0);
 }
 

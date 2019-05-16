@@ -193,6 +193,18 @@ void display_camera(int camera_index) {
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
 	draw_ironman();
 
+	// DRAW WOLF
+	ModelViewProjectionMatrix = glm::rotate(ViewProjectionMatrix[camera_index], wolf_rotation_angle * TO_RADIAN, wolf_pos);
+	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, wolf_pos);
+	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(30, 30, 30));
+
+//	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 0));
+
+
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+	draw_wolf();
+	draw_circle();
+
 
 	// DRAW BRICKS
 	float y = (11 + 20) / 17.0f;
@@ -223,11 +235,12 @@ void display_camera(int camera_index) {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// RUSH
-	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(142.5, 110, 100));
-	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
-
-	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_RUSH();
+	if (RUSHON) {
+		ModelMatrix_RUSH = glm::translate(glm::mat4(1.0f), glm::vec3(-142.5f, 0, 3));
+		ModelViewProjectionMatrix = ViewProjectionMatrix[0] * ModelMatrix_RUSH;
+		glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+		draw_RUSH();
+	}
 
 
 
@@ -238,6 +251,12 @@ void display() {
 
 	display_camera(0);
 	//display_camera(1);
+
+	//ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[0], glm::vec3(142.5, 110, 100));
+	//ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(4.5f, 4.5f, 4.5f));
+
+
+
 	glutSwapBuffers();
 }
 
@@ -356,10 +375,12 @@ void car_timer(int value) {
 void timer_scene(int value) {
 	if (!animation) return;
 
-	// TIGER
+	// MOVING OBJECT
 	cur_frame_tiger = (value / 3) % N_TIGER_FRAMES;
 	cur_frame_ben = value % N_BEN_FRAMES;
 	cur_frame_spider = (value / 3) % N_SPIDER_FRAMES;
+	cur_frame_wolf = (value / 3) % N_WOLF_FRAMES;
+
 
 	//  BEN
 	static int ben_idx = 1, ben_tmp = 1;
@@ -405,6 +426,8 @@ void timer_scene(int value) {
 	// IRONMAN
 	get_ironman_pos();
 
+	// WOLF
+	get_wolf_pos();
 		
 	// BRICK
 	if (cam_moving)
@@ -573,6 +596,9 @@ void keyboard(unsigned char key, int x, int y) {
 			glutTimerFunc(100, timer_scene, 0);
 			glutTimerFunc(1, timer_scene_2, 0);
 		}
+		break;
+	case 'h':
+		RUSHON = 1 - RUSHON;
 		break;
 	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
@@ -750,6 +776,9 @@ void cleanup(void) {
 	/*glDeleteVertexArrays(1, &cylinder_VAO);
 	glDeleteBuffers(1, &cylinder_VBO);*/
 	
+	glDeleteVertexArrays(1, &RUSH_VAO);
+	glDeleteBuffers(1, &RUSH_VBO);
+
 	glDeleteVertexArrays(1, &cow_VAO);
 	glDeleteBuffers(1, &cow_VBO);
 
@@ -767,6 +796,9 @@ void cleanup(void) {
 
 	glDeleteVertexArrays(1, &ironman_VAO);
 	glDeleteBuffers(1, &ironman_VBO);
+
+	glDeleteVertexArrays(1, &wolf_VAO);
+	glDeleteBuffers(1, &wolf_VBO);
 
 	free_geom_obj(GEOM_OBJ_ID_CAR_BODY);
 	free_geom_obj(GEOM_OBJ_ID_CAR_WHEEL);

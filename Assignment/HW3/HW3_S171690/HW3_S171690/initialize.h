@@ -86,6 +86,7 @@ void prepare_scene() {
 	prepare_tiger();
 	prepare_spider();
 	prepare_ironman();
+	prepare_wolf();
 	
 	prepare_geom_obj(GEOM_OBJ_ID_CAR_BODY, "Data/Car/car_body_triangles_v.txt", GEOM_OBJ_TYPE_V);
 	prepare_geom_obj(GEOM_OBJ_ID_CAR_WHEEL, "Data/Car/car_wheel_triangles_v.txt", GEOM_OBJ_TYPE_V);
