@@ -205,10 +205,9 @@ void get_ironman_pos() {
 	}
 }
 
-glm::vec3 wolf_pos = { 0.0f, 0.0f, 30.0f };
+float wolf_radius = 142.5f;
+glm::vec3 wolf_pos = { wolf_radius, 0.0f, 200.0f };
 int wolf_rotation_angle = 0;
-float wolf_radius = 30;
-void get_wolf_pos() {
-	wolf_pos[0] = wolf_radius * cos(wolf_rotation_angle * TO_RADIAN);
-	wolf_pos[1] = wolf_radius * sin(wolf_rotation_angle * TO_RADIAN);
-}
+int wolf_rotate_speed = 1;
+#define WOLF_MAX_RADIUS 300
+#define WOLF_MIN_RADIUS 50

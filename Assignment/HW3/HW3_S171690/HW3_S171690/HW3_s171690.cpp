@@ -194,16 +194,22 @@ void display_camera(int camera_index) {
 	draw_ironman();
 
 	// DRAW WOLF
-	ModelViewProjectionMatrix = glm::rotate(ViewProjectionMatrix[camera_index], wolf_rotation_angle * TO_RADIAN, wolf_pos);
+	glm::mat4 wolf_circle;
+	ModelViewProjectionMatrix = glm::rotate(ViewProjectionMatrix[camera_index], wolf_rotation_angle * TO_RADIAN, glm::vec3(0, 0, 1));
 	ModelViewProjectionMatrix = glm::translate(ModelViewProjectionMatrix, wolf_pos);
 	ModelViewProjectionMatrix = glm::scale(ModelViewProjectionMatrix, glm::vec3(30, 30, 30));
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 180 * TO_RADIAN, glm::vec3(0, 0, 1));
 
 //	ModelViewProjectionMatrix = glm::translate(ViewProjectionMatrix[camera_index], glm::vec3(0, 0, 0));
 
 
 	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
-	draw_wolf();
 	draw_circle();
+	//wolf_circle = glm::rotate(ModelViewProjectionMatrix, )
+	ModelViewProjectionMatrix = glm::rotate(ModelViewProjectionMatrix, 90 * TO_RADIAN, glm::vec3(1, 0, 0));
+	glUniformMatrix4fv(loc_ModelViewProjectionMatrix, 1, GL_FALSE, &ModelViewProjectionMatrix[0][0]);
+
+	draw_wolf();
 
 
 	// DRAW BRICKS
@@ -372,6 +378,15 @@ void car_timer(int value) {
 	glutPostRedisplay();
 	glutTimerFunc(car_timer_scene, car_timer, (value + 1) % INT_MAX);
 }
+void wolf_timer(int value) {
+	if (!animation) return;
+
+	wolf_pos[0] = wolf_radius;
+	wolf_rotation_angle = (wolf_rotation_angle + wolf_rotate_speed) % 360;
+
+	glutPostRedisplay();
+	glutTimerFunc(10, wolf_timer, (value + 1) % INT_MAX);
+}
 void timer_scene(int value) {
 	if (!animation) return;
 
@@ -426,9 +441,6 @@ void timer_scene(int value) {
 	// IRONMAN
 	get_ironman_pos();
 
-	// WOLF
-	get_wolf_pos();
-		
 	// BRICK
 	if (cam_moving)
 		moveCam();
@@ -589,10 +601,21 @@ void keyboard(unsigned char key, int x, int y) {
 		printf("%f\n", car_timer_scene);
 		break;
 
+	case 'x':
+		wolf_radius += 15;
+		if (wolf_radius >= WOLF_MAX_RADIUS)
+			wolf_radius = WOLF_MAX_RADIUS;
+		break;
+	case 'z':
+		wolf_radius -= 15;
+		if (wolf_radius <= WOLF_MIN_RADIUS)
+			wolf_radius = WOLF_MIN_RADIUS;
+		break;
 	case 'a':
 		animation = 1 - animation;
 		if (animation) {
 			glutTimerFunc(100, car_timer, 0);
+			glutTimerFunc(10, wolf_timer, 0);
 			glutTimerFunc(100, timer_scene, 0);
 			glutTimerFunc(1, timer_scene_2, 0);
 		}
@@ -821,6 +844,7 @@ void register_callbacks(void) {
 	glutReshapeFunc(reshape);
 
 	glutTimerFunc(100, car_timer, 0);
+	glutTimerFunc(10, wolf_timer, 0);
 	glutTimerFunc(100, timer_scene, 0);
 	glutTimerFunc(1, timer_scene_2, 0);
 	

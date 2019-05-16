@@ -251,7 +251,7 @@ void prepare_circle() {
 void draw_circle() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	GLfloat color[3] = { 180.0f / 255, 0.0f / 255, 0.0f / 255 };
+	GLfloat color[3] = { 244 / 255.0f, 252 / 255.0f, 17 / 255.0f };
 	glBindVertexArray(circle_VAO);
 	glUniform3fv(loc_primitive_color, 1, color);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 362);
@@ -287,7 +287,6 @@ void prepare_RUSH() {
 	setVertex(&(RUSH_vertices[idx++]), 0.2, 0.1, 0);
 	setVertex(&(RUSH_vertices[idx++]), -0.5, 0.1, 0);
 	setVertex(&(RUSH_vertices[idx++]), 0.42, -0.7, 0);
-
 
 	// U
 	U_idx = idx;
@@ -835,6 +834,8 @@ void draw_ironman(void) {
 void draw_wolf(void) {
 	glFrontFace(GL_CW);
 
+	GLfloat color[3] = { 7 / 255.0f, 103 / 255.0f, 155 / 255.0f };
+	glUniform3fv(loc_primitive_color, 1, color);
 	glBindVertexArray(wolf_VAO);
 	glDrawArrays(GL_TRIANGLES, wolf_vertex_offset[cur_frame_wolf], 3 * wolf_n_triangles[cur_frame_wolf]);
 	glBindVertexArray(0);
