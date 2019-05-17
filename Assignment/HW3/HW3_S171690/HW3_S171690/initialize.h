@@ -132,7 +132,7 @@ void greetings(char *program_name, char messages[][256], int n_message_lines) {
 	fprintf(stdout, "\t        \t\tr, b, l, w, d, c, t\n");
 	fprintf(stdout, "\t        \t\tCTRL + KEY-UP, CTRL+KEY-DOWN, CTRL + KEY-LEFT, CTRL + KEY-RIGHT\n");
 	fprintf(stdout, "\tZOOM IN/ OUT\t\tSHIFT + MOUSE_LEFT_BUTTON\n");
-	fprintf(stdout, "\tCONTROL ANIMATION\ti, a, m, n, x, z, h\n");
+	fprintf(stdout, "\tCONTROL ANIMATION\ti, a, m, n, x, z\n");
 	fprintf(stdout, "\tLETTER\t\t\th\n");
 	fprintf(stdout, "\tPOLYGON MODE\t\tp\n");
 

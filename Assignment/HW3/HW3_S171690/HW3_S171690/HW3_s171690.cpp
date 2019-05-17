@@ -491,7 +491,7 @@ void timer_scene_2(int value) {
 unsigned int leftbutton_pressed = 0;
 int prevx, prevy;
 void mousePressed(int button, int state, int x, int y) {
-	view_brick = 0;
+	//view_brick = 0;
 	if ((button == GLUT_LEFT_BUTTON) && (state == GLUT_DOWN)) {
 		prevx = x, prevy = y;
 		leftbutton_pressed = 1;
@@ -507,7 +507,7 @@ void mousePressed(int button, int state, int x, int y) {
 #define CAM_MAX_ZOOM_OUT_FACTOR	2.50f
 
 void motion(int x, int y) {
-	view_brick = 0;
+	//view_brick = 0;
 
 	//if (!(view_mode == VIEW_WORLD || view_mode == VIEW_CAR || view_mode == VIEW_TIGER)) return;
 
@@ -538,7 +538,8 @@ void motion(int x, int y) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	view_brick = 0;
+	if (key != 'p' && key != 'a' && key != 'i')
+		view_brick = 0;
 	switch (key) {
 		/*case 'f':
 			flag_fog = 1 - flag_fog;
@@ -630,7 +631,8 @@ void keyboard(unsigned char key, int x, int y) {
 
 #define SUB_CAM_MOVING_SCENE 15
 void special(int key, int x, int y) {
-	view_brick = 0;
+	if (key != 'p' && key != 'a' && key != 'i')
+		view_brick = 0;
 
 	if (view_mode == DRIVER_PERS || view_mode == TIGER_PERS) return;
 	glm::vec3 n, u, v;
