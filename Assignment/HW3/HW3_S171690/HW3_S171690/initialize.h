@@ -134,7 +134,7 @@ void greetings(char *program_name, char messages[][256], int n_message_lines) {
 	fprintf(stdout, "\tZOOM IN/ OUT\t\tSHIFT + MOUSE_LEFT_BUTTON\n");
 	fprintf(stdout, "\tCONTROL ANIMATION\ti, a, m, n, x, z\n");
 	fprintf(stdout, "\tLETTER\t\t\th\n");
-	fprintf(stdout, "\tPOLYGON MODE\t\tp\n");
+	fprintf(stdout, "\tPOLYGON MODE\t\tp\n\n");
 
 	initialize_glew();
 }

@@ -754,6 +754,8 @@ void special(int key, int x, int y) {
 }
 
 void reshape(int width, int height) {
+	win_width = width;
+	win_height = height;
 	camera[0].aspect_ratio = (float)width / height;
 	viewport[0].x = viewport[0].y = 0;
 	viewport[0].w = (int)(width); viewport[0].h = (int)(height);

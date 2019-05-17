@@ -169,6 +169,8 @@ void moveCam() {
 	glutPostRedisplay();
 }
 
+int win_width;
+int win_height;
 void reset_CAM() {
 	target_cam.prp = glm::vec3(500.0f, 400.0f, 400.0f);
 	target_cam.vrp = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -179,6 +181,8 @@ void reset_CAM() {
 	target_cam.near_clip = 0.1f;
 	target_cam.far_clip = 1200.0f;
 	target_cam.zoom_factor = 1.0f;
+
+	target_cam.aspect_ratio = (float)win_width / win_height;
 
 	view_mode = VIEW_WORLD;
 	cam_moving = 1;
