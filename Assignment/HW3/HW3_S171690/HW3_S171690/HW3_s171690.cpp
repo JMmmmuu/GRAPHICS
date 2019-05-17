@@ -616,11 +616,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'p':		// toggle polygon mode
 		flag_polygon_fill = 1 - flag_polygon_fill;
-		/*if (flag_polygon_fill)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glutPostRedisplay();*/
+
 		break;
 	case 27:		// ESC key
 		glutLeaveMainLoop();

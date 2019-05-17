@@ -177,12 +177,10 @@ void reset_CAM() {
 	target_cam.vup = glm::vec3(0.0f, 0.0f, 1.0f);
 
 	target_cam.fov_y = 45.0f;
-	target_cam.aspect_ratio = 1.0f;
+	target_cam.aspect_ratio = (float)win_width / win_height;
 	target_cam.near_clip = 0.1f;
 	target_cam.far_clip = 1200.0f;
 	target_cam.zoom_factor = 1.0f;
-
-	target_cam.aspect_ratio = (float)win_width / win_height;
 
 	view_mode = VIEW_WORLD;
 	cam_moving = 1;

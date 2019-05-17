@@ -460,7 +460,6 @@ void draw_cylinder() {
 }*/
 
 
-
 // tiger object
 #define N_TIGER_FRAMES 12
 GLuint tiger_VBO, tiger_VAO;

@@ -49,10 +49,6 @@ void initialize_OpenGL() {
 	camera[1].zoom_factor = 1.0f; // will be used for zoomming in and out.
 
 	view_mode = VIEW_WORLD;
-	/*
-	ModelMatrix_CAR_BODY = glm::mat4(1.0f);
-	ModelMatrix_CAR_WHEEL = glm::mat4(1.0f);
-	ModelMatrix_CAR_NUT = glm::mat4(1.0f);*/
 
 	// the transformation that moves the driver's camera frame from car body's MC to driver seat
 	ModelMatrix_CAR_BODY_to_DRIVER = glm::translate(glm::mat4(1.0f), glm::vec3(-3.0f, 0.5f, 2.5f));
