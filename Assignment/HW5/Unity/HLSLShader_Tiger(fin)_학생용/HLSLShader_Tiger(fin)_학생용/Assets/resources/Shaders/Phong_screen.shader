@@ -55,6 +55,10 @@
 				return o;
 			}
 
+			float mod(float x, float y) {
+				return x - y * int(x / y);
+			}
+
 			fixed4 frag(v2f i) : SV_Target
 			{
 				// sample the texture
@@ -65,6 +69,12 @@
 
 				if (screen_effect == 1) {
 					/* TO DO : Screen Effect 구현*/
+					float x_mod, y_mod;
+					x_mod = mod(x * 2 * screen_frequency, 1.0f);
+					y_mod = mod(y * screen_frequency, 1.0f);
+
+					if ((x_mod > screen_width) && (x_mod < 1.0f - screen_width) && (y_mod > screen_width) && (y_mod < 1.0f - screen_width))
+						discard;
 				}
 
 

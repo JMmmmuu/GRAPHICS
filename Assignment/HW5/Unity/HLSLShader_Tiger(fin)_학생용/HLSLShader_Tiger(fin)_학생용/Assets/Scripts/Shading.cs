@@ -82,7 +82,7 @@ public class Shading : MonoBehaviour
     Screen screen;
     Ben ben;
 
-   // Wolf wolf;
+    //Wolf wolf;
     //Spider spider;
 
     public class PlayObject
@@ -148,60 +148,56 @@ public class Shading : MonoBehaviour
 
         public Wolf(Material material_ps_defualt) : base(material_ps_defualt)
         {
-            object_name = "Wolf";
+            object_name = "wolf";
             rotation_angle = 1f;
             prepare_object(material_ps_defualt);
         }
 
         new void prepare_object(Material material_ps_default)
         {
-            material_parameter = new Material_Parameters();
-            material_parameter.ambient_color = new Vector4(0.24725f, 0.1995f, 0.0745f, 1.0f);
-            material_parameter.diffuse_color = new Vector4(0.75164f, 0.60648f, 0.22648f, 1.0f);
-            material_parameter.specular_color = new Vector4(0.628281f, 0.555802f, 0.366065f, 1.0f);
-            material_parameter.specular_exponent = 51.2f;
-            material_parameter.emissive_color = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
-
             N_FRAME = 17;
             now_frame = 0;
 
             meshes = new Mesh[N_FRAME];
 
-            for (int i = 0; i < N_FRAME; i++)
+            for (int i = 1; i <= N_FRAME; i++)
             {
                 string fileName = "Models/Wolf/wolf_0000" + i.ToString("D2");
-                Console.WriteLine(fileName);
-                Console.WriteLine(12);
                 GameObject frame = Resources.Load(fileName) as GameObject;
-                //Mesh frameMesh = frame.transform.Find("wolf_0000" + i.ToString("D2")).GetComponent<MeshFilter>().sharedMesh;
-                //meshes[i] = frameMesh;
+
+
+                Mesh frameMesh = frame.transform.Find("default").GetComponent<MeshFilter>().sharedMesh;
+                meshes[i-1] = frameMesh;
             }
 
             GameObject gObject = GameObject.Find(object_name);
-            Figure = gObject.transform.Find("Tiger_0");
-
-            //Figure = gObject.transform.Find("wolf_000000");
+            Figure = gObject.transform.Find("default");
 
             gameObject = gObject;
 
             set_material(material_ps_default);
         }
-        */
 
-/*
+        public override void set_material(Material material_ps_default)
+        {
+            Material material = new Material(Shader.Find("HLSL/Phong_screen"));
+
+            Figure.GetComponent<Renderer>().material = material;
+        }
+
         public override void move()
         {
             base.move();
             //위치 이동. 회전하는 물체이므로 원점을 기준으로 회전시킨다.
-            //gameObject.transform.RotateAround(Vector3.zero, Vector3.up, -rotation_angle);
+            gameObject.transform.RotateAround(Vector3.zero, Vector3.up, -rotation_angle);
 
         }
 
         public float getRotateAngle()
         {
             return rotation_angle;
-        }*/
-    //}
+        }
+    }*/
     /*
     public class Spider : PlayObject
     {
@@ -419,7 +415,6 @@ public class Shading : MonoBehaviour
 
     public class Screen : PlayObject
     {
-        
         float frequency;
         float width;
         int draw_flag, effect_flag;
@@ -485,6 +480,8 @@ public class Shading : MonoBehaviour
             frequency += 1;
             if (frequency > SCREEN_MAX_FREQUENCY)
                 frequency = SCREEN_MAX_FREQUENCY;
+            Debug.Log(frequency);
+
         }
 
         public void freq_down()
@@ -493,6 +490,7 @@ public class Shading : MonoBehaviour
             frequency -= 1;
             if (frequency < SCREEN_MIN_FREQUENCY)
                 frequency = SCREEN_MIN_FREQUENCY;
+            Debug.Log(frequency);
         }
 
     }
@@ -989,6 +987,8 @@ public class Shading : MonoBehaviour
     bool init = false;
     void Start()
     {
+        int i = 3;
+        Console.Write("Models/Wolf/wolf_0000" + i.ToString("D2"));
         //방향축 2개 배치하고 호랑이, 바닥판 생성해야 함.
         initialize_renderer();
 
