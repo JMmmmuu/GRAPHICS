@@ -25,8 +25,8 @@ public class Shading : MonoBehaviour
 
     public struct Light_Parameters
     {
-        public int Pos_Type;  //EC/WC/MC
-        public int Light_Type;  //spot/point
+        public int Pos_Type;  // EC/WC/MC
+        public int Light_Type;  // spot/point
         public int light_on;
         public Vector4 position;
         public Vector4 position_default;
@@ -73,14 +73,17 @@ public class Shading : MonoBehaviour
 
     Material_Parameters material_floor;
     static Light_Parameters[] light_property = new Light_Parameters[NUMBER_OF_LIGHT_SUPPORTED];
-    Material material_ps_default;    //ps 쉐이더의 디폴트 메테리얼. 빛 등의 정보를 미리 기입한다.
+    Material material_ps_default;    // ps 쉐이더의 디폴트 메테리얼. 빛 등의 정보를 미리 기입한다.
     int animationFlag = 1;
 
-    //배치된 오브젝트의 데이터 및 관리 클래스들
+    // 배치된 오브젝트의 데이터 및 관리 클래스들
     Tiger tiger;
     Floor floor;
     Screen screen;
     Ben ben;
+
+   // Wolf wolf;
+    //Spider spider;
 
     public class PlayObject
     {
@@ -115,7 +118,6 @@ public class Shading : MonoBehaviour
 
         public virtual void set_material(Material material_ps_default)
         {
-
             Material material = new Material(Shader.Find("HLSL/Phong_cg"));
             material.CopyPropertiesFromMaterial(material_ps_default);   //기본 정보(빛 등)을 가져온다.
 
@@ -138,8 +140,152 @@ public class Shading : MonoBehaviour
                 Figure.GetComponent<MeshFilter>().mesh = meshes[now_frame];//다음 프레임으로 변경
             }
         }
+    }
+    /*
+    public class Wolf : PlayObject
+    {
+        float rotation_angle = 0.0f;
 
-       }
+        public Wolf(Material material_ps_defualt) : base(material_ps_defualt)
+        {
+            object_name = "Wolf";
+            rotation_angle = 1f;
+            prepare_object(material_ps_defualt);
+        }
+
+        new void prepare_object(Material material_ps_default)
+        {
+            material_parameter = new Material_Parameters();
+            material_parameter.ambient_color = new Vector4(0.24725f, 0.1995f, 0.0745f, 1.0f);
+            material_parameter.diffuse_color = new Vector4(0.75164f, 0.60648f, 0.22648f, 1.0f);
+            material_parameter.specular_color = new Vector4(0.628281f, 0.555802f, 0.366065f, 1.0f);
+            material_parameter.specular_exponent = 51.2f;
+            material_parameter.emissive_color = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
+
+            N_FRAME = 17;
+            now_frame = 0;
+
+            meshes = new Mesh[N_FRAME];
+
+            for (int i = 0; i < N_FRAME; i++)
+            {
+                string fileName = "Models/Wolf/wolf_0000" + i.ToString("D2");
+                Console.WriteLine(fileName);
+                Console.WriteLine(12);
+                GameObject frame = Resources.Load(fileName) as GameObject;
+                //Mesh frameMesh = frame.transform.Find("wolf_0000" + i.ToString("D2")).GetComponent<MeshFilter>().sharedMesh;
+                //meshes[i] = frameMesh;
+            }
+
+            GameObject gObject = GameObject.Find(object_name);
+            Figure = gObject.transform.Find("Tiger_0");
+
+            //Figure = gObject.transform.Find("wolf_000000");
+
+            gameObject = gObject;
+
+            set_material(material_ps_default);
+        }
+        */
+
+/*
+        public override void move()
+        {
+            base.move();
+            //위치 이동. 회전하는 물체이므로 원점을 기준으로 회전시킨다.
+            //gameObject.transform.RotateAround(Vector3.zero, Vector3.up, -rotation_angle);
+
+        }
+
+        public float getRotateAngle()
+        {
+            return rotation_angle;
+        }*/
+    //}
+    /*
+    public class Spider : PlayObject
+    {
+        float rotation_angle = 0.0f;
+
+        public Spider(Material material_ps_default) : base(material_ps_default)
+        {
+            object_name = "Spider";
+            rotation_angle = 1f;
+            prepare_object(material_ps_default);
+        }
+
+        // spider 오브젝트 생성 및 색상 설정
+        new void prepare_object(Material material_ps_default)
+        {
+            //Tiger 색상 데이터 설정
+            material_parameter = new Material_Parameters();
+            material_parameter.ambient_color = new Vector4(0.24725f, 0.1995f, 0.0745f, 1.0f);
+            material_parameter.diffuse_color = new Vector4(0.75164f, 0.60648f, 0.22648f, 1.0f);
+            material_parameter.specular_color = new Vector4(0.628281f, 0.555802f, 0.366065f, 1.0f);
+            material_parameter.specular_exponent = 51.2f;
+            material_parameter.emissive_color = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
+
+            N_FRAME = 12;
+            now_frame = 0;
+
+            meshes = new Mesh[N_FRAME];
+
+            for (int i = 0; i < N_FRAME; i++)
+            {
+                GameObject frame = Resources.Load("Models/Spider/spider_0000" + i.ToString("D2")) as GameObject;
+                Mesh fameMesh = frame.transform.Find("spider__0000" + i.ToString("D2")).GetComponent<MeshFilter>().sharedMesh;
+                meshes[i] = fameMesh;
+            }
+
+            GameObject gObject = GameObject.Find(object_name);
+            Figure = gObject.transform.Find("spider__000000");
+
+            gameObject = gObject;
+
+            set_material(material_ps_default);
+            set_material_axes();
+        }
+
+        // spider 오브젝트 하단의 축
+        void set_material_axes()
+        {
+            GameObject Axes = GameObject.Find("Axes_Spider");
+            GameObject axes_x = Axes.transform.Find("Axes-x").gameObject;
+            GameObject axes_y = Axes.transform.Find("Axes-y").gameObject;
+            GameObject axes_z = Axes.transform.Find("Axes-z").gameObject;
+
+            //세 축이 다른 색상(쉐이더의 변수가 다름)을 사용하므로 다른 메테리얼을 사용해야 한다.
+            Renderer axes_x_renderer = axes_x.GetComponent<Renderer>();
+            Material material1 = new Material(Shader.Find("HLSL/Simple_cg"));
+            material1.SetColor("_Primitive_color", new Color(1, 0, 0, 0));
+            axes_x_renderer.material = material1;
+
+            Renderer axes_y_renderer = axes_y.GetComponent<Renderer>();
+            Material material2 = new Material(Shader.Find("HLSL/Simple_cg"));
+            material2.SetColor("_Primitive_color", new Color(0, 1, 0, 0));
+            axes_y_renderer.material = material2;
+
+            Renderer axes_z_renderer = axes_z.GetComponent<Renderer>();
+            Material material3 = new Material(Shader.Find("HLSL/Simple_cg"));
+            material3.SetColor("_Primitive_color", new Color(0, 0, 1, 0));
+            axes_z_renderer.material = material3;
+
+        }
+
+        public override void move()
+        {
+            base.move();
+            //위치 이동. 회전하는 물체이므로 원점을 기준으로 회전시킨다.
+            gameObject.transform.RotateAround(Vector3.zero, Vector3.up, -rotation_angle);
+
+
+        }
+
+        public float getRotateAngle()
+        {
+            return rotation_angle;
+        }
+    }*/
 
     public class Tiger : PlayObject
     {
@@ -277,8 +423,8 @@ public class Shading : MonoBehaviour
         float frequency;
         float width;
         int draw_flag, effect_flag;
-        static float SCEEN_MAX_FREQUENCY = 50.0f;
-        static float SCEEN_MIN_FREQUENCY = 1.0f;
+        static float SCREEN_MAX_FREQUENCY = 50.0f;
+        static float SCREEN_MIN_FREQUENCY = 1.0f;
         
         public Screen(Material material_ps_default) : base(material_ps_default)
         {
@@ -303,7 +449,6 @@ public class Shading : MonoBehaviour
             ////메테리얼 생성
             gameObject = gObject;
             set_material(material_ps_default);
-            
         }
 
         public override void set_material(Material material_ps_default)
@@ -318,20 +463,15 @@ public class Shading : MonoBehaviour
             material.SetFloat("screen_width", width);
 
             Figure.GetComponent<Renderer>().material = material;
-
         }
 
         public void changeScreenDraw()
         {
             draw_flag = 1 - draw_flag;
             if (draw_flag == 1)
-            {
                 gameObject.SetActive(true);
-            }
             else
-            {
                 gameObject.SetActive(false);
-            }
         }
 
         public void changeScreenEffect()
@@ -342,11 +482,17 @@ public class Shading : MonoBehaviour
         public void freq_up()
         {
             /* TO DO : screen frequency ++ 구현 */
+            frequency += 1;
+            if (frequency > SCREEN_MAX_FREQUENCY)
+                frequency = SCREEN_MAX_FREQUENCY;
         }
 
         public void freq_down()
         {
             /* TO DO : screen frequency -- 구현 */
+            frequency -= 1;
+            if (frequency < SCREEN_MIN_FREQUENCY)
+                frequency = SCREEN_MIN_FREQUENCY;
         }
 
     }
@@ -357,7 +503,10 @@ public class Shading : MonoBehaviour
         
         float rotation_angle = 1.0f;
         int jump_flag = 0;
-        
+        int jump_up = 0;
+        int MAX_HEIGHT = 100;
+        int MIN_HEIGHT = 0;
+
         public Ben(Material material_ps_default) : base(material_ps_default)
         {
             object_name = "Ben";
@@ -497,6 +646,33 @@ public class Shading : MonoBehaviour
             if (jump_flag == 1)
             {
                 /* TO DO : Ben jump 구현 */
+                //gameObject.transform.Translate(Vector3.)
+                /*
+                if (jump_up == 1)
+                {
+                    gameObject.transform.Translate()
+                    gameObject.transform.position.y += 10;
+                    if (gameObject.transform.position.y > MAX_HEIGHT)
+                    {
+                        gameObject.transform.position.y = MAX_HEIGHT;
+                        jump_up = 0;
+                    }
+                }
+                else
+                {
+                    gameObject.transform.position.y -= 10;
+                    if (gameObject.transform.position.y < MIN_HEIGHT)
+                    {
+                        gameObject.transform.position.y = MIN_HEIGHT;
+                    }
+                }
+
+
+                if (gameObject.transform.position)
+                if (gameObject.transform.position.y < MAX_HEIGHT)
+                    gameObject.transform.position.y += 10;
+                    */
+
             }
             else
             {
@@ -510,11 +686,14 @@ public class Shading : MonoBehaviour
         public void jump()
         {
             jump_flag = 1 - jump_flag;
+                jump_up = 1;
         }
 
         public void back()
         {
             /* TO DO : Ben Back 구현 */
+
+
         }
     }
 
@@ -763,10 +942,16 @@ public class Shading : MonoBehaviour
         tiger = new Tiger(material_ps_default);
         ben = new Ben(material_ps_default);
 
+        //wolf = new Wolf(material_ps_default);
+        //spider = new Spider(material_ps_default);
+
+
         playObjectList.Add(floor);
         playObjectList.Add(tiger);
         playObjectList.Add(screen);
         playObjectList.Add(ben);
+        //playObjectList.Add(wolf);
+        //playObjectList.Add(spider);
     }
 
     //초기화 수행.
@@ -912,6 +1097,8 @@ public class Shading : MonoBehaviour
                 break;
             case (int)ButtonID.Blind:
                 /* TO DO : Blind 효과 작성 */
+
+
                 break;
             case (int)ButtonID.Exotic:
                 exotic_flag = 1 - exotic_flag;
