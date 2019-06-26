@@ -464,7 +464,7 @@ public class Shading : MonoBehaviour
         float rotation_angle = 1.0f;
         int jump_flag = 0;
         int jump_up = 0;
-        int MAX_HEIGHT = 100;
+        int MAX_HEIGHT = 220;
         int MIN_HEIGHT = 0;
 
         public Ben(Material material_ps_default) : base(material_ps_default)
@@ -606,32 +606,23 @@ public class Shading : MonoBehaviour
             if (jump_flag == 1)
             {
                 /* TO DO : Ben jump 구현 */
-                //gameObject.transform.Translate(Vector3.)
-                /*
+                Vector3 pos = gameObject.transform.position;
                 if (jump_up == 1)
                 {
-                    gameObject.transform.Translate()
-                    gameObject.transform.position.y += 10;
-                    if (gameObject.transform.position.y > MAX_HEIGHT)
+                    pos.y += 30;
+                    if (pos.y > MAX_HEIGHT)
                     {
-                        gameObject.transform.position.y = MAX_HEIGHT;
+                        pos.y = MAX_HEIGHT;
                         jump_up = 0;
                     }
                 }
                 else
                 {
-                    gameObject.transform.position.y -= 10;
-                    if (gameObject.transform.position.y < MIN_HEIGHT)
-                    {
-                        gameObject.transform.position.y = MIN_HEIGHT;
-                    }
+                    pos.y -= 30;
+                    if (pos.y < MIN_HEIGHT)
+                        pos.y = MIN_HEIGHT;
                 }
-
-
-                if (gameObject.transform.position)
-                if (gameObject.transform.position.y < MAX_HEIGHT)
-                    gameObject.transform.position.y += 10;
-                    */
+                gameObject.transform.position = pos;
 
             }
             else
@@ -856,7 +847,50 @@ public class Shading : MonoBehaviour
         
         light_property[1].spot_cutoff_angle = 20.0f;//스포트 라이트 각도 20도
         light_property[1].spot_exponent = 27.0f;
-                       
+
+        // light 3
+        light_property[2].Pos_Type = COORD_EC;
+        light_property[2].Light_Type = Light_Point;
+        light_property[2].light_on = 0;
+        light_property[2].slit_count = 0;
+
+        light_property[2].position[0] = 0.0f; light_property[2].position[1] = -5.0f;  // point light position in EC
+        light_property[2].position[2] = 0.0f; light_property[2].position[3] = 1.0f;
+
+        light_property[2].ambient_color[0] = 0.2f; light_property[2].ambient_color[1] = 0.2f;
+        light_property[2].ambient_color[2] = 0.2f; light_property[2].ambient_color[3] = 1.0f;
+
+        light_property[2].diffuse_color[0] = 0.8f; light_property[2].diffuse_color[1] = 0.8f;
+        light_property[2].diffuse_color[2] = 0.8f; light_property[2].diffuse_color[3] = 1.0f;
+    
+        light_property[2].specular_color[0] = 0.9f; light_property[2].specular_color[1] = 0.9f;
+        light_property[2].specular_color[2] = 0.9f; light_property[2].specular_color[3] = 1.0f;
+
+        // light 4
+        light_property[3].Pos_Type = COORD_WC;
+        light_property[3].Light_Type = Light_Spot;
+        light_property[3].light_on = 0;
+        light_property[3].slit_count = 0;
+
+        light_property[3].position_default[0] = 0.0f; light_property[3].position_default[1] = 50.0f;
+        light_property[3].position_default[2] = -70.0f; light_property[3].position_default[3] = 0.0f;
+
+        light_property[3].ambient_color[0] = 0.2f; light_property[3].ambient_color[1] = 0.2f;
+        light_property[3].ambient_color[2] = 0.2f; light_property[3].ambient_color[3] = 1.0f;
+
+        light_property[3].diffuse_color[0] = 0.7f; light_property[3].diffuse_color[1] = 0.7f;
+        light_property[3].diffuse_color[2] = 0.7f; light_property[3].diffuse_color[3] = 1.0f;
+
+        light_property[3].specular_color[0] = 0.9f; light_property[3].specular_color[1] = 0.2f;
+        light_property[3].specular_color[2] = 0.2f; light_property[3].specular_color[3] = 1.0f;
+
+        light_property[3].spot_direction[0] = 0.0f; light_property[3].spot_direction[1] = 0.0f; // spot light direction in WC
+        light_property[3].spot_direction[2] = -1.0f;
+
+        light_property[3].spot_cutoff_angle = 15.0f;
+        light_property[3].spot_exponent = 27.0f;
+
+
         // need to supply position in EC for shading
         Camera cam = GetComponent<Camera>();//카메라가 중점을 바라보도록
         cam.transform.LookAt(Vector3.zero);
