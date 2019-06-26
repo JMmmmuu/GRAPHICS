@@ -82,7 +82,7 @@ public class Shading : MonoBehaviour
     Screen screen;
     Ben ben;
 
-    //Wolf wolf;
+    Wolf wolf;
     //Spider spider;
 
     public class PlayObject
@@ -141,14 +141,14 @@ public class Shading : MonoBehaviour
             }
         }
     }
-    /*
+    
     public class Wolf : PlayObject
     {
         float rotation_angle = 0.0f;
 
         public Wolf(Material material_ps_defualt) : base(material_ps_defualt)
         {
-            object_name = "wolf";
+            object_name = "Wolf";
             rotation_angle = 1f;
             prepare_object(material_ps_defualt);
         }
@@ -157,32 +157,31 @@ public class Shading : MonoBehaviour
         {
             N_FRAME = 17;
             now_frame = 0;
-
             meshes = new Mesh[N_FRAME];
 
             for (int i = 1; i <= N_FRAME; i++)
             {
                 string fileName = "Models/Wolf/wolf_0000" + i.ToString("D2");
                 GameObject frame = Resources.Load(fileName) as GameObject;
-
-
                 Mesh frameMesh = frame.transform.Find("default").GetComponent<MeshFilter>().sharedMesh;
                 meshes[i-1] = frameMesh;
             }
 
             GameObject gObject = GameObject.Find(object_name);
-            Figure = gObject.transform.Find("default");
+            Figure = gObject.transform.Find("Figure");
 
             gameObject = gObject;
-
-            set_material(material_ps_default);
+            //set_material(material_ps_default);
         }
 
         public override void set_material(Material material_ps_default)
         {
-            Material material = new Material(Shader.Find("HLSL/Phong_screen"));
+            base.set_material(material_ps_default);
+            Texture2D m_MainTexture = (Texture2D)Resources.Load("Models/Ben/MJeans1TEX_Lores");
 
-            Figure.GetComponent<Renderer>().material = material;
+
+            Figure.GetComponent<Renderer>().material.SetTexture("u_base_texture", m_MainTexture);
+            Figure.GetComponent<Renderer>().material.SetInt("u_flag_texture_mapping", 1);
         }
 
         public override void move()
@@ -197,7 +196,7 @@ public class Shading : MonoBehaviour
         {
             return rotation_angle;
         }
-    }*/
+    }
     /*
     public class Spider : PlayObject
     {
@@ -480,7 +479,6 @@ public class Shading : MonoBehaviour
             frequency += 1;
             if (frequency > SCREEN_MAX_FREQUENCY)
                 frequency = SCREEN_MAX_FREQUENCY;
-            Debug.Log(frequency);
 
         }
 
@@ -490,7 +488,6 @@ public class Shading : MonoBehaviour
             frequency -= 1;
             if (frequency < SCREEN_MIN_FREQUENCY)
                 frequency = SCREEN_MIN_FREQUENCY;
-            Debug.Log(frequency);
         }
 
     }
@@ -940,7 +937,7 @@ public class Shading : MonoBehaviour
         tiger = new Tiger(material_ps_default);
         ben = new Ben(material_ps_default);
 
-        //wolf = new Wolf(material_ps_default);
+        wolf = new Wolf(material_ps_default);
         //spider = new Spider(material_ps_default);
 
 
@@ -948,7 +945,7 @@ public class Shading : MonoBehaviour
         playObjectList.Add(tiger);
         playObjectList.Add(screen);
         playObjectList.Add(ben);
-        //playObjectList.Add(wolf);
+        playObjectList.Add(wolf);
         //playObjectList.Add(spider);
     }
 
