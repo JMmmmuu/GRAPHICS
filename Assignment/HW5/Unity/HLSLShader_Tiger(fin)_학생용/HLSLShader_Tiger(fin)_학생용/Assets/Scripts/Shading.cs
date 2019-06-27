@@ -871,32 +871,38 @@ public class Shading : MonoBehaviour
         light_property[1].spot_cutoff_angle = 20.0f;//스포트 라이트 각도 20도
         light_property[1].spot_exponent = 27.0f;
 
-        // light 3
+        // light 2
         light_property[2].Pos_Type = COORD_EC;
-        light_property[2].Light_Type = Light_Point;
+        light_property[2].Light_Type = Light_Spot;
         light_property[2].light_on = 0;
         light_property[2].slit_count = 0;
 
-        light_property[2].position[0] = 0.0f; light_property[2].position[1] = -5.0f;  // point light position in EC
-        light_property[2].position[2] = 0.0f; light_property[2].position[3] = 1.0f;
+        light_property[2].position[0] = 10.0f; light_property[2].position[1] = 10.0f;  // spot light position in eC
+        light_property[2].position[2] = 10.0f; light_property[2].position[3] = 1.0f;
 
         light_property[2].ambient_color[0] = 0.2f; light_property[2].ambient_color[1] = 0.2f;
         light_property[2].ambient_color[2] = 0.2f; light_property[2].ambient_color[3] = 1.0f;
 
-        light_property[2].diffuse_color[0] = 0.8f; light_property[2].diffuse_color[1] = 0.8f;
-        light_property[2].diffuse_color[2] = 0.8f; light_property[2].diffuse_color[3] = 1.0f;
+        light_property[2].diffuse_color[0] = 1.0f; light_property[2].diffuse_color[1] = 0.3f;
+        light_property[2].diffuse_color[2] = 0.3f; light_property[2].diffuse_color[3] = 1.0f;
     
-        light_property[2].specular_color[0] = 0.9f; light_property[2].specular_color[1] = 0.9f;
-        light_property[2].specular_color[2] = 0.9f; light_property[2].specular_color[3] = 1.0f;
+        light_property[2].specular_color[0] = 1.0f; light_property[2].specular_color[1] = 0.3f;
+        light_property[2].specular_color[2] = 0.3f; light_property[2].specular_color[3] = 1.0f;
 
-        // light 4
+        light_property[2].spot_direction[0] = 0.0f; light_property[2].spot_direction[1] = -1.0f;
+        light_property[2].spot_direction[2] = 0.0f;
+
+        light_property[2].spot_cutoff_angle = 25.0f;//스포트 라이트 각도 20도
+        light_property[2].spot_exponent = 27.0f;
+
+        // light 3
         light_property[3].Pos_Type = COORD_WC;
         light_property[3].Light_Type = Light_Spot;
         light_property[3].light_on = 0;
         light_property[3].slit_count = 0;
 
-        light_property[3].position_default[0] = 0.0f; light_property[3].position_default[1] = 50.0f;
-        light_property[3].position_default[2] = 30.0f; light_property[3].position_default[3] = 1.0f;
+        light_property[3].position_default[0] = 0.0f; light_property[3].position_default[1] = 40.0f;
+        light_property[3].position_default[2] = 10.0f; light_property[3].position_default[3] = 1.0f;
 
         light_property[3].ambient_color[0] = 0.2f; light_property[3].ambient_color[1] = 0.2f;
         light_property[3].ambient_color[2] = 0.2f; light_property[3].ambient_color[3] = 1.0f;
@@ -907,8 +913,8 @@ public class Shading : MonoBehaviour
         light_property[3].specular_color[0] = 1.0f; light_property[3].specular_color[1] = 0.7f;
         light_property[3].specular_color[2] = 0.7f; light_property[3].specular_color[3] = 1.0f;
 
-        light_property[3].spot_direction[0] = 0.0f; light_property[3].spot_direction[1] = 0.0f; // spot light direction in WC
-        light_property[3].spot_direction[2] = -1.0f;
+        //light_property[3].spot_direction[0] = 0.0f; light_property[3].spot_direction[1] = 0.0f; // spot light direction in WC
+        //light_property[3].spot_direction[2] = -1.0f;
 
         light_property[3].spot_cutoff_angle = 15.0f;
         light_property[3].spot_exponent = 27.0f;
@@ -1020,7 +1026,7 @@ public class Shading : MonoBehaviour
         }
         GameObject.Find("Main Camera").transform.position = camPos;
         cam.transform.LookAt(Vector3.zero);
-        cam.transform.LookAt(Vector3.zero);
+        cam.transform.LookAt(Vector3.zero);        
     }
     //카메라 회전. 네 방향을 회전한다.
     int cam_rot_num = 0;
@@ -1042,7 +1048,20 @@ public class Shading : MonoBehaviour
     public void move_cameraLight()
     {
         /* TO DO : Light 2 움직임 구현 */
+        Camera cam = GetComponent<Camera>();
+        Matrix4x4 ViewMatrix = cam.worldToCameraMatrix;
+        //mat3 형식으로 사용
+        Matrix4x4 ViewMatrix_mat3 = ViewMatrix;
+        ViewMatrix_mat3[0, 3] = 0;
+        ViewMatrix_mat3[1, 3] = 0;
+        ViewMatrix_mat3[2, 3] = 0;
+        ViewMatrix_mat3[3, 3] = 0;
+        ViewMatrix_mat3[3, 2] = 0;
+        ViewMatrix_mat3[3, 1] = 0;
+        ViewMatrix_mat3[3, 0] = 0;
 
+        Vector4 dir = ViewMatrix_mat3 * new Vector4(-1, -1, -1);
+        light_property[2].spot_direction = new Vector3(dir.x, dir.y, dir.z);
     }
 
     bool init = false;
@@ -1254,7 +1273,7 @@ public class Shading : MonoBehaviour
 
     // exotic 조명 효과
     int exotic_flag = 0;
-    int exotic_direction = 1;
+    //int exotic_direction = 1;
     void move_exotic()
     {
         /* TO DO : Exotic 효과 재작성 */
