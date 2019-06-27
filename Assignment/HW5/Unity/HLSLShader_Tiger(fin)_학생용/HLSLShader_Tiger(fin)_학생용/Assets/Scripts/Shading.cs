@@ -975,23 +975,41 @@ public class Shading : MonoBehaviour
         /* TO DO : Move Camera 구현 */
         GameObject cam = GameObject.Find("Main Camera");
         Vector3 camPos = cam.transform.position;
-        Vector3 offset = new Vector3(50.0f, 50.0f, 50.0f);
+        int[,] sign = new int[4, 3] { { 1, 1, 1 }, { -1, 1, 1 }, { -1, 1, -1 }, { 1, 1, -1 } };
 
+        Vector3 offset = new Vector3(sign[cam_rot_num, 0] * 50.0f, sign[cam_rot_num, 1] * 50.0f, sign[cam_rot_num, 2] * 50.0f);
+        /*switch (cam_rot_num)
+        {
+            case 1:
+                offset[0] *= -1;
+                break;
+            case 2:
+                offset[0] *= -1; offset[2] *= -1;
+                break;
+            case 3:
+                offset[2] *= -1;
+                break;
+        }*/
+
+        //Vector3 offset = new Vector3(sign[cam_rot_num] * 50.0f, 50.0f, sign[cam_rot_num] * 50.0f);
+        Debug.Log(cam_rot_num);
+        Debug.Log(camPos);
         if (cam_closer == 1)
         {
             camPos -= offset;
-            if (camPos[0] <= CAM_CLOSEST)
+            if (Math.Abs(camPos[0]) <= CAM_CLOSEST)
             {
-                camPos = new Vector3(100, 100, 100);
+
+                camPos = new Vector3(sign[cam_rot_num, 0] * 100, sign[cam_rot_num, 1] * 100, sign[cam_rot_num, 2] * 100);
                 cam_closer = 0;
             }
         }
         else
         {
             camPos += offset;
-            if (camPos[0] >= CAM_FAR)
+            if (Math.Abs(camPos[0]) >= CAM_FAR)
             {
-                camPos = new Vector3(500, 500, 500);
+                camPos = new Vector3(sign[cam_rot_num, 0] * 500, sign[cam_rot_num, 1] * 500, sign[cam_rot_num, 2] * 500);
                 cam_closer = 1;
             }
         }
