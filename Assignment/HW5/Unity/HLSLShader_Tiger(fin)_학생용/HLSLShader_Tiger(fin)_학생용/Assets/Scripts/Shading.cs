@@ -620,7 +620,10 @@ public class Shading : MonoBehaviour
                 {
                     pos.y -= 30;
                     if (pos.y < MIN_HEIGHT)
+                    {
                         pos.y = MIN_HEIGHT;
+                        jump_flag = 0;
+                    }
                 }
                 gameObject.transform.position = pos;
 
@@ -637,13 +640,13 @@ public class Shading : MonoBehaviour
         public void jump()
         {
             jump_flag = 1 - jump_flag;
-                jump_up = 1;
+            jump_up = 1;
         }
 
         public void back()
         {
             /* TO DO : Ben Back 구현 */
-
+            //rotation_angle *= -1;
 
         }
     }
@@ -964,10 +967,35 @@ public class Shading : MonoBehaviour
     Vector3 cam_direction = new Vector3(1,1,1);
 
     //카메라 이동. 점점 멀어지다가 일정 이상 멀어지면 다가간다.
+    int cam_closer = 1;
+    int CAM_CLOSEST = 100;
+    int CAM_FAR = 500;
     public void move_camera()
     {
         /* TO DO : Move Camera 구현 */
+        GameObject cam = GameObject.Find("Main Camera");
+        Vector3 camPos = cam.transform.position;
+        Vector3 mag = new Vector3(50.0f, 50.0f, 50.0f);
 
+        if (cam_closer == 1)
+        {
+            camPos -= mag;
+            if (camPos[0] <= CAM_CLOSEST)
+            {
+                camPos = new Vector3(100, 100, 100);
+                cam_closer = 0;
+            }
+        }
+        else
+        {
+            camPos += mag;
+            if (camPos[0] >= CAM_FAR)
+            {
+                camPos = new Vector3(500, 500, 500);
+                cam_closer = 1;
+            }
+        }
+        GameObject.Find("Main Camera").transform.position = camPos;
     }
     //카메라 회전. 네 방향을 회전한다.
     public void rotate_camera()
@@ -978,6 +1006,7 @@ public class Shading : MonoBehaviour
     public void move_cameraLight()
     {
         /* TO DO : Light 2 움직임 구현 */
+
     }
 
     bool init = false;
@@ -1093,13 +1122,23 @@ public class Shading : MonoBehaviour
                 break;
             case (int)ButtonID.Blind:
                 /* TO DO : Blind 효과 작성 */
-
-
+                blind_flag = 1 - blind_flag;
+                if (blind_flag == 1)
+                {
+                    light_property[1].slit_count = 30.0f;
+                    exotic_flag = 0;
+                }
+                else
+                    light_property[1].slit_count = 0.0f;
+                    
                 break;
             case (int)ButtonID.Exotic:
                 exotic_flag = 1 - exotic_flag;
-                if(exotic_flag == 0)
+                if (exotic_flag == 0)
+                {
                     light_property[1].slit_count = 0;
+                    blind_flag = 0;
+                }
                 break;
 
             case (int)ButtonID.Screen:
@@ -1170,6 +1209,13 @@ public class Shading : MonoBehaviour
         }
     }
 
+    // blind effect
+    int blind_flag = 0;
+   /* void blind_effect()
+    {
+
+    }*/
+
     // exotic 조명 효과
     int exotic_flag = 0;
     int exotic_direction = 1;
@@ -1233,12 +1279,15 @@ public class Shading : MonoBehaviour
         //이동
         if (init)
         {
-            for(int i = 0; i < playObjectList.Count; i++)
+            if (animationFlag == 1)
             {
-                playObjectList[i].move();
-            }
+                for (int i = 0; i < playObjectList.Count; i++)
+                {
+                    playObjectList[i].move();
+                }
 
-            move_exotic();
+                move_exotic();
+            }
         }
         update_materials();
 
