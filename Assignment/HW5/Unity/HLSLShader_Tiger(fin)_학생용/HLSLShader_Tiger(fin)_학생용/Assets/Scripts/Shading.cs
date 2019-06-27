@@ -975,11 +975,11 @@ public class Shading : MonoBehaviour
         /* TO DO : Move Camera 구현 */
         GameObject cam = GameObject.Find("Main Camera");
         Vector3 camPos = cam.transform.position;
-        Vector3 mag = new Vector3(50.0f, 50.0f, 50.0f);
+        Vector3 offset = new Vector3(50.0f, 50.0f, 50.0f);
 
         if (cam_closer == 1)
         {
-            camPos -= mag;
+            camPos -= offset;
             if (camPos[0] <= CAM_CLOSEST)
             {
                 camPos = new Vector3(100, 100, 100);
@@ -988,7 +988,7 @@ public class Shading : MonoBehaviour
         }
         else
         {
-            camPos += mag;
+            camPos += offset;
             if (camPos[0] >= CAM_FAR)
             {
                 camPos = new Vector3(500, 500, 500);
@@ -996,11 +996,24 @@ public class Shading : MonoBehaviour
             }
         }
         GameObject.Find("Main Camera").transform.position = camPos;
+        cam.transform.LookAt(Vector3.zero);
+        cam.transform.LookAt(Vector3.zero);
     }
     //카메라 회전. 네 방향을 회전한다.
+    int cam_rot_num = 0;
     public void rotate_camera()
     {
         /* TO DO : Move Camera 구현 */
+        GameObject cam = GameObject.Find("Main Camera");
+        Vector3 camPos = cam.transform.position;
+
+        int[] sin = new int[] { -1, 1, -1, 1 };
+        int[] cos = new int[] { 1, -1, 1, -1 };
+        cam_rot_num = (cam_rot_num + 1) % 4;
+
+
+        cam.transform.position = new Vector3(cos[cam_rot_num] * camPos[0], camPos[1], sin[cam_rot_num] * camPos[2]);
+        cam.transform.LookAt(Vector3.zero);
     }
 
     public void move_cameraLight()
@@ -1125,7 +1138,7 @@ public class Shading : MonoBehaviour
                 blind_flag = 1 - blind_flag;
                 if (blind_flag == 1)
                 {
-                    light_property[1].slit_count = 30.0f;
+                    light_property[1].slit_count = 20.0f;
                     exotic_flag = 0;
                 }
                 else
@@ -1224,7 +1237,7 @@ public class Shading : MonoBehaviour
         /* TO DO : Exotic 효과 재작성 */
         if (exotic_flag == 1)
         {
-            if (exotic_direction == 1)
+            /*if (exotic_direction == 1)
             {
                 if (light_property[1].slit_count < 1000)
                 {
@@ -1249,8 +1262,9 @@ public class Shading : MonoBehaviour
                 {
                     exotic_direction = 1;
                 }
-            }
-
+            }*/
+            light_property[1].slit_count = UnityEngine.Random.Range(0, 1000);
+            
             update_materials();
         }
     }
