@@ -197,9 +197,10 @@ public class Shading : MonoBehaviour
             return rotation_angle;
         }
     }
-    
+
     public class Spider : PlayObject
     {
+        int move_up = 1;
         public Spider(Material material_ps_default) : base(material_ps_default)
         {
             object_name = "Spider";
@@ -218,7 +219,7 @@ public class Shading : MonoBehaviour
             {
                 GameObject frame = Resources.Load("Models/Spider/spider__0000" + i.ToString("D2")) as GameObject;
                 Mesh frameMesh = frame.transform.Find("default").GetComponent<MeshFilter>().sharedMesh;
-                meshes[i-1] = frameMesh;
+                meshes[i - 1] = frameMesh;
             }
 
             GameObject gObject = GameObject.Find(object_name);
@@ -242,8 +243,27 @@ public class Shading : MonoBehaviour
             base.move();
             //위치 이동. 회전하는 물체이므로 원점을 기준으로 회전시킨다.
             //gameObject.transform.RotateAround(Vector3.zero, Vector3.up, -rotation_angle);
-
-
+            Vector3 spider_pos = gameObject.transform.position;
+            if (move_up == 1)
+            {
+                spider_pos[1] += 7.0f;
+                if (spider_pos[1] >= 200)
+                {
+                    spider_pos[1] = 200.0f;
+                    move_up = 0;
+                }
+                gameObject.transform.position = spider_pos;
+            }
+            else
+            {
+                spider_pos[1] -= 7.0f;
+                if (spider_pos[1] <= 50)
+                {
+                    spider_pos[1] = 50.0f;
+                    move_up = 1;
+                }
+                gameObject.transform.position = spider_pos;
+            }
         }
     }
 
@@ -876,16 +896,16 @@ public class Shading : MonoBehaviour
         light_property[3].slit_count = 0;
 
         light_property[3].position_default[0] = 0.0f; light_property[3].position_default[1] = 50.0f;
-        light_property[3].position_default[2] = -70.0f; light_property[3].position_default[3] = 0.0f;
+        light_property[3].position_default[2] = 30.0f; light_property[3].position_default[3] = 1.0f;
 
         light_property[3].ambient_color[0] = 0.2f; light_property[3].ambient_color[1] = 0.2f;
         light_property[3].ambient_color[2] = 0.2f; light_property[3].ambient_color[3] = 1.0f;
 
-        light_property[3].diffuse_color[0] = 0.7f; light_property[3].diffuse_color[1] = 0.7f;
-        light_property[3].diffuse_color[2] = 0.7f; light_property[3].diffuse_color[3] = 1.0f;
+        light_property[3].diffuse_color[0] = 0.82f; light_property[3].diffuse_color[1] = 0.82f;
+        light_property[3].diffuse_color[2] = 0.82f; light_property[3].diffuse_color[3] = 1.0f;
 
-        light_property[3].specular_color[0] = 0.9f; light_property[3].specular_color[1] = 0.2f;
-        light_property[3].specular_color[2] = 0.2f; light_property[3].specular_color[3] = 1.0f;
+        light_property[3].specular_color[0] = 1.0f; light_property[3].specular_color[1] = 0.7f;
+        light_property[3].specular_color[2] = 0.7f; light_property[3].specular_color[3] = 1.0f;
 
         light_property[3].spot_direction[0] = 0.0f; light_property[3].spot_direction[1] = 0.0f; // spot light direction in WC
         light_property[3].spot_direction[2] = -1.0f;
@@ -978,22 +998,7 @@ public class Shading : MonoBehaviour
         int[,] sign = new int[4, 3] { { 1, 1, 1 }, { -1, 1, 1 }, { -1, 1, -1 }, { 1, 1, -1 } };
 
         Vector3 offset = new Vector3(sign[cam_rot_num, 0] * 50.0f, sign[cam_rot_num, 1] * 50.0f, sign[cam_rot_num, 2] * 50.0f);
-        /*switch (cam_rot_num)
-        {
-            case 1:
-                offset[0] *= -1;
-                break;
-            case 2:
-                offset[0] *= -1; offset[2] *= -1;
-                break;
-            case 3:
-                offset[2] *= -1;
-                break;
-        }*/
 
-        //Vector3 offset = new Vector3(sign[cam_rot_num] * 50.0f, 50.0f, sign[cam_rot_num] * 50.0f);
-        Debug.Log(cam_rot_num);
-        Debug.Log(camPos);
         if (cam_closer == 1)
         {
             camPos -= offset;
